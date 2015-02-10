@@ -1,6 +1,9 @@
 {
-    "dropbox": {
-        "appkey": "YOUR APP KEY HERE",
-        "appsecret": "YOUR APP SECRET HERE"
+    "Dropbox": {
+        "AppKey": "YOUR APP KEY HERE",
+        "AppSecret": "YOUR APP SECRET HERE"
+    },
+    "Server": {
+        "WebRoot": "./public"
     }
 }

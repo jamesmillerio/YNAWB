@@ -1,0 +1,39 @@
+<div class="row">
+
+    <div class="col-lg-12">
+
+        <div class="well gray gray-well-border">
+
+            <div class="row" style="height: 900px; overflow: auto;" match-viewport-height="90%">
+
+                <div class="col-lg-3">
+
+                    <div class="panel panel-default">
+
+                        <ul class="list-group">
+
+                            <li class="list-group-item active" ng-repeat-start="category in masterCategories | orderBy: 'sortableIndex'"> 
+
+                                {{ category.name }}
+
+                            </li>
+
+                            <li class="list-group-item" ng-repeat-end ng-repeat="subcategory in category.subCategories | orderBy:'sortableIndex'">
+
+                                {{ subcategory.name }}
+
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
