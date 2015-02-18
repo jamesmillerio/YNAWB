@@ -1,5 +1,5 @@
 angular.module('YNAWB') 
-    .controller('HomeController', ['$scope', '$routeParams', '$location', 'BudgetDataService', function($scope, $routeParams, $location, budgetDataService) {
+    .controller('SummaryController', ['$scope', '$http', '$routeParams', 'BudgetDataService', function($scope, $http, $routeParams, budgetDataService) {
 
         budgetDataService.getBudgetData()
             .then(function(b) {
@@ -9,5 +9,5 @@ angular.module('YNAWB')
                 $scope.budgetFile = "budgetfilehere";
 
             });
-      
+
     }]);

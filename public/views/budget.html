@@ -8,27 +8,41 @@
 
                 <div class="col-lg-3">
 
-                    <div class="panel panel-default">
+                    <div class="row budget-summary-height">
 
-                        <ul class="list-group">
+                    </div>
 
-                            <li class="list-group-item active" ng-repeat-start="category in masterCategories | orderBy: 'sortableIndex'"> 
+                    <div class="row">
 
-                                {{ category.name }}
+                        <div class="panel panel-default">
 
-                            </li>
+                            <ul class="list-group">
 
-                            <li class="list-group-item" ng-repeat-end ng-repeat="subcategory in category.subCategories | orderBy:'sortableIndex'">
+                                <li class="list-group-item active budget-category-height" ng-repeat-start="category in masterCategories | orderBy: 'sortableIndex'"> 
 
-                                {{ subcategory.name }}
+                                    {{ category.name }}
 
-                            </li>
+                                </li>
 
-                        </ul>
+                                <li class="list-group-item budget-category-height" ng-repeat-end ng-repeat="subcategory in category.subCategories | orderBy:'sortableIndex'">
+
+                                    {{ subcategory.name }}
+
+                                </li>
+
+                            </ul>
+
+                        </div>
 
                     </div>
 
                 </div>
+
+                <budget-list budget="budgetData[0]" categories="masterCategories"></budget-list>
+
+                <budget-list budget="budgetData[1]" categories="masterCategories"></budget-list>
+
+                <budget-list budget="budgetData[2]" categories="masterCategories"></budget-list>
 
             </div>
 

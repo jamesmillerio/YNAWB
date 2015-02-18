@@ -104,6 +104,24 @@ textarea {
 .white { color: #fff; }
 .gray { background: #DBDBDB; }
 .gray-well-border { border-color: #007399; }
+.available-to-budget-color { color: #ADCD5C; }
+
+.text-align-center { text-align: center; }
+.text-align-right { text-align: right; }
+
+.text-sm { font-size: 0.7em; }
+.text-sm-2 { font-size: 0.9em; }
+.text-md { font-size: 1.0em; }
+.text-lg { font-size: 1.2em; }
+.text-xl { font-size: 2.0em; }
+
+.text-bold { font-weight: bold; }
+
+.padding-horizontal-sm { padding-left: 3px; padding-right: 3px; }
+
+.padding-sm { padding: 3px 3px 3px 3px; }
+
+.padding-left-sm { padding-left: 3px; }
 
 .margin-left-m { margin-left: 10px; }
 .margin-left-l { margin-left: 15px; }
@@ -114,17 +132,30 @@ textarea {
     color: #fff;
 }
 
+.panel-dark {
+    background-color: #3C464D;
+    color: #DBDBDB;
+}
+
 .shadow-dark { text-shadow: 2px 2px #000; }
 
 .budget-icon-color { color: #D5ED43; }
 .reports-icon-color { color: #FDCC59; }
 .all-accounts-icon-color { color: #37D9FF; }
 
+.width-full { width: 100%; }
+.width-one-third { width: 33% !important; }
 
+.budget-category-height { height: 52px; }
+.budget-summary-height { height: 210px;}
 
-
-
-
+/* Flag colors */
+.Red { color: red; }
+.Orange { color: orange; }
+.Yellow { color: yellow; }
+.Green { color: green; }
+.Blue { color: red; }
+.Purple { color: red; }
 
 /* ==========================================================================
    Helper classes

@@ -23,7 +23,25 @@
 
 // Place any jQuery/helper plugins in here.
 
-Date.prototype.toYNABDate = function() {
+String.prototype.fromYNABDateToDateString = function() {
+
+    var split = this.split("-");
+
+    return split[1] + "/" + split[2] + "/" + split[0].substring(2, 4);
+
+};
+
+String.prototype.toYNABMonthDate = function() {
+
+    var split = this.split("-");
+    var y = split[0];
+    var m = split[1];
+
+    return y + "-" + m;
+
+};
+
+Date.prototype.toYNABMonthDate = function() {
 
     var y = this.getFullYear().toString();
     var m = (this.getMonth() + 1).toString();
@@ -31,6 +49,42 @@ Date.prototype.toYNABDate = function() {
     //Prepend a zero if needed.
     if(m.length == 1) { m = "0" + m; }
 
-    return y + "-" + m + "-01";
+    return y + "-" + m;
+
+};
+
+Date.prototype.toYNABDate = function() {
+
+    return this.toYNABMonthDate() + "-01";
+
+};
+
+Date.prototype.getMonthAbbr = function() {
+
+    var abbr = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+
+    return abbr[this.getMonth()];
+
+};
+
+Number.prototype.toCurrency = function(blankOnZero) {
+
+    if(blankOnZero == null) {
+        blankOnZero = false;
+    }
+
+    if(this == null) {
+        return "";
+    }
+
+    if(blankOnZero && this == 0) {
+        return "";
+    }
+
+    if(this < 0) {
+        return "-$" + Math.abs(this).toFixed(2);
+    }
+
+    return "$" + this.toFixed(2);
 
 };

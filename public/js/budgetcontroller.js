@@ -1,41 +1,29 @@
 angular.module('YNAWB') 
-    .controller('BudgetController', ['$scope', '$http', function($scope, $http) {
+    .controller('BudgetController', ['$scope', '$routeParams', '$q', 'BudgetDataService', function($scope, $routeParams, $q, budgetDataService) {
 
-        $http.get("/budgetdata")
-            .success(function(b) {
+        $scope.accountId = $routeParams.account;
 
-                /*  We only want dates from the current
-                    month and two months out. We also want
-                    them in a specific format. */
-                var now = new Date();
-                var neededBudgets = _.map([ 
-                    new Date(now.getFullYear(), now.getMonth(), 1),
-                    new Date(now.getFullYear(), now.getMonth() + 1, 1),
-                    new Date(now.getFullYear(), now.getMonth() + 2, 1),
-                ], function(d) { 
-                    return d.toYNABDate(); 
-                });
+        budgetDataService.getBudgetData($scope.accountId)
+            .then(function(b) {
 
-                //Do some filtering for future use
-                $scope.monthlyBudgets = _.filter(b.monthlyBudgets, function(budget) { return _.contains(neededBudgets, budget.month); });
-                $scope.masterCategories = _.filter(b.masterCategories, function(c) { return c.sortableIndex > 0 && (!c.hasOwnProperty("isTombstone") || !c.isTombstone); });
+                var neededMonthCount = 3;
+                var dt = new Date();
+                var promises = [];
 
-                //Map our master categories with only sub categories that .
-                $scope.masterCategories = _.map($scope.masterCategories, function(c) {
+                //Set our needed scope variables.
+                $scope.masterCategories = b.masterCategories;
+                $scope.budgetData = [];
 
-                    c.subCategories = _.filter(c.subCategories, function(c2) {
+                //Just in case we decide to add more columns in the future, use a loop.
+                for(var i = 1; i <= neededMonthCount; i++) {
+                    promises.push(budgetDataService.getBudgetDataForMonth($scope.accountId, dt.getFullYear(), dt.getMonth() + i));
+                }
 
-                        return !c2.hasOwnProperty("isTombstone") || !c2.isTombstone;
-
+                //Now go get all of our budget data.
+                $q.all(promises)
+                    .then(function(budgets) {
+                        $scope.budgetData = _.sortBy(budgets, function(b) { return b.summary.date; });;
                     });
-
-                    return c;
-
-                });
-
-                console.log($scope.monthlyBudgets);
-
-                window.budget = b;
 
             });
 

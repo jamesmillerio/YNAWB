@@ -1,1 +1,173 @@
-This is our transactions view
+<div class="row">
+
+    <div class="jumbotron col-lg-10 col-lg-offset-1" ng-hide="transactions">
+
+        <h2>
+
+            <i class="fa fa-spinner fa-spin"></i>
+
+            Loading...
+
+        </h2>
+
+        <p>
+
+            Please wait while we load your transactions. This could take some time if you have a large transactions history.
+
+        </p>
+
+    </div>
+
+    <div class="col-lg-12" ng-show="transactions">
+
+        <div class="well gray-well-border">
+
+            <div class="row" style="height: 900px; overflow: auto;" match-viewport-height="90%">
+
+                <table class="table table-hover table-striped text-sm-2">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+
+                                <input type="checkbox" ng-click="toggleCheckAll()" ng-checked="checkAll" />
+
+                            </th>
+
+                            <th>
+
+                                Account
+
+                            </th>
+
+                            <th>
+
+                                <i class="fa fa-tags"></i>
+
+                            </th>
+
+                            <th>
+
+                                Date
+
+                            </th>
+
+                            <th>
+
+                                Payee
+
+                            </th>
+
+                            <th>
+
+                                Category
+
+                            </th>
+
+                            <th>
+
+                                Memo
+
+                            </th>
+
+                            <th>
+
+                                Outflow
+
+                            </th>
+
+                            <th>
+
+                                Inflow
+
+                            </th>
+
+                            <th>
+
+                                C
+
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr ng-repeat="t in transactions | orderBy: t.date">
+
+                            <td>
+
+                                <input type="checkbox" ng-checked="checkAll" />
+
+                            </td>
+
+                            <td>
+
+                                {{ t.accountName }}
+
+                            </td>
+
+                            <td>
+
+                                <i class="fa fa-tags {{ t.flag }}" ng-show="t.flag"></i>
+
+                            </td>
+
+                            <td>
+
+                                {{ t.date.fromYNABDateToDateString() }}
+
+                            </td>
+
+                            <td>
+
+                                {{ t.payeeName }}
+
+                            </td>
+
+                            <td>
+
+                                {{ t.categoryName }}
+
+                            </td>
+
+                            <td>
+
+                                {{ t.memo }}
+
+                            </td>
+
+                            <td>
+
+                                {{ (t.amount < 0) ? t.amount.toCurrency() : "" }}
+
+                            </td>
+
+                            <td>
+
+                                {{ (t.amount > 0) ? t.amount.toCurrency() : "" }}
+
+                            </td>
+
+                            <td>
+
+                                <i class="fa" ng-class="{ 'fa-circle': t.cleared, 'fa-circle-o': !t.cleared }"></i>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

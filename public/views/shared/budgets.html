@@ -1,0 +1,199 @@
+<div class="col-lg-3">
+
+    <div class="row budget-summary-height">
+
+        <div class="col-lg-12">
+
+            <div class="panel panel-default panel-dark">
+
+                <div class="row padding-sm">
+
+                    <div class="col-lg-2 text-align-center text-lg text-bold">
+
+                        {{ budget.summary.monthAbbr }}
+
+                        <div class="text-sm padding-left-sm">
+
+                            {{ budget.summary.year}}
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-8 text-sm">
+
+                        <div class="row">
+
+                            <div class="col-lg-4 text-align-right padding-horizontal-sm">
+
+                                {{ (budget.summary.income - budget.summary.budgeted).toCurrency() }}
+                                <br />
+                                -0.00
+                                <br />
+                                +{{ budget.summary.income.toCurrency() }}
+                                <br />
+                                -{{ budget.summary.budgeted.toCurrency() }}
+                                <br />
+                                <span class="text-xl">
+                                    =
+                                </span>
+
+                            </div>
+
+                            <div class="col-lg-8 padding-horizontal-sm">
+
+                                Not Budgeted in Jan
+                                <br />
+                                Overspent in Jan
+                                <br />
+                                Income for Feb
+                                <br />
+                                Budgeted in Feb
+                                <br />
+                                <span class="text-xl available-to-budget-color">
+
+                                    {{ budget.summary.availableToBudget.toCurrency() }}
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-lg-12 text-align-center">
+
+                                Available to budget
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-2 text-align-center text-md">
+
+                        <i class="fa fa-file-text"></i>
+
+                        <br />
+
+                        <i class="fa fa-flash"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-12">
+
+            <div class="panel panel-default ">
+
+                <ul class="list-group">
+
+                    <li class="list-group-item active">
+
+                        <div class="form-inline">
+
+                            <div class="form-group">
+                        
+                                <div class="input-group">
+                        
+                                    <div class="input-group-addon input-sm width-one-third text-align-right">
+
+                                        Budgeted<br />{{ budget.summary.budgeted.toCurrency() }}
+
+                                    </div>
+
+                                    <div class="input-group-addon input-sm width-one-third text-align-right">
+                                        
+                                        Outflows<br />{{ budget.summary.outflows.toCurrency() }}
+
+                                    </div>
+                        
+                                    <div class="input-group-addon input-sm width-one-third text-align-right">
+                                        
+                                        Balance<br />{{ budget.summary.balance.toCurrency() }}
+
+                                    </div>
+                        
+                                </div>
+                        
+                            </div>
+                        
+                        </div>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+
+            <div class="panel panel-default">
+                
+                <ul class="list-group">
+
+                    <li class="list-group-item active" ng-repeat-start="category in categories | orderBy: 'sortableIndex'"> 
+
+                        <div class="form-inline">
+
+                            <div class="form-group width-full">
+                        
+                                <div class="input-group width-full">
+
+                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ totalBudgeted(category, budget).toCurrency() }}" disabled="disabled" />
+
+                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ totalOutflows(category, budget).toCurrency() }}" disabled="disabled" />
+
+                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ totalBalance(category, budget).toCurrency() }}" disabled="disabled" />
+
+                                </div>
+                        
+                            </div>
+                        
+                        </div>
+
+                    </li>
+
+                    <li class="list-group-item" ng-repeat-end ng-repeat="subcategory in category.subCategories | orderBy:'sortableIndex'">
+
+                        <div class="form-inline">
+
+                            <div class="form-group">
+                        
+                                <div class="input-group">
+                        
+                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].budgeted.toCurrency(true) }}">
+
+                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].outflowAmount.toCurrency(true) }}" disabled="disabled">
+                        
+                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].runningDifference.toCurrency() }}" disabled="disabled">
+                        
+                                </div>
+                        
+                            </div>
+                        
+                        </div>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
