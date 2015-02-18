@@ -397,6 +397,9 @@ angular.module('YNAWB')
 
                          });
 
+                         /* Remove any closed accounts. */
+                         b.accounts = _.filter(b.accounts, function(a) { return (!a.hasOwnProperty("isTombstone") || !a.isTombstone); });
+
                         //Save for later use.
                         self.budgetdata = b;
 
