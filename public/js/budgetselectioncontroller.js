@@ -9,13 +9,15 @@ angular.module('YNAWB')
                 $scope.budgets = _.map(b, function(value, key, list) {
 
                     var p = _.last(key.split("/"));
-                    var title = _.first(p.split("~"));
+                    var file = p.split("~");
+                    var title = _.first(file);
+                    var id = _.first(_.last(file).split("."));
 
                     index++;
 
                     return {
                         title: title,
-                        path: encodeURIComponent(key),
+                        path: id,
                         id: "budget_" + index.toString(),
                         devices: _.map(value, function(v) {
                             return {

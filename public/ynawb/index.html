@@ -48,7 +48,7 @@
 
                                             <i class="fa fa-tags budget-icon-color"></i> 
 
-                                            <a href="#/budget/{{ budgetFile }}/account/{{ defaultAccount.entityId }}" class="white">
+                                            <a href="#/budget/{{ budget }}/{{ device }}/account/{{ defaultAccount.entityId }}" class="white">
                                                 
                                                 Budget
 
@@ -68,7 +68,7 @@
 
                                             <i class="fa fa-line-chart reports-icon-color"></i> 
 
-                                                <a class="white" href="#/reports/{{ budgetFile }}/account/{{ defaultAccount.entityId }}">
+                                                <a class="white" href="#/reports/{{ budgetFile }}/{{ device }}/account/{{ defaultAccount.entityId }}">
 
                                                     Reports
 
@@ -88,7 +88,7 @@
 
                                             <i class="fa fa-bank all-accounts-icon-color"></i>
 
-                                                <a class="white" href="#/transactions/{{ budgetFile }}/account/all">
+                                                <a class="white" href="#/transactions/{{ budget }}/{{ device }}/account/all">
 
                                                     All Accounts
 
@@ -122,7 +122,7 @@
 
                                     <h5 class="margin-left-l shadow-dark" ng-repeat="account in accounts">
 
-                                        <a class="white" href="#/transactions/{{ budgetFile }}/account/{{ account.entityId }}">
+                                        <a class="white" href="#/transactions/{{ budget }}/{{ device }}/account/{{ account.entityId }}">
 
                                             {{ account.accountName }}
 

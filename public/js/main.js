@@ -5,15 +5,15 @@ angular.module('YNAWB', ['ngRoute'])
         controller:'HomeController',
         templateUrl:'/views/home.html'
       })
-      .when('/budget/:budget/account/:account', {
+      .when('/budget/:budget/:device/account/:account', {
         controller:'BudgetController',
         templateUrl:'/views/budget.html'
       })
-      .when('/reports/:budget/account/:account', {
+      .when('/reports/:budget/:device/account/:account', {
         controller: 'ReportController',
         templateUrl: '/views/report.html'
       })
-      .when('/transactions/:budget/account/:account', {
+      .when('/transactions/:budget/:device/account/:account', {
         controller:'TransactionsController',
         templateUrl:'/views/transactions.html'
       })

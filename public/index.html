@@ -1,5 +1,145 @@
-<a href="/auth">
+<!doctype html>
 
-    Log into Dropbox
+<html class="no-js" lang="" ng-app="YNAWB">
 
-</a>
+    <head>
+
+        <meta charset="utf-8">
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <title>You Need a Web Budget</title>
+
+        <meta name="description" content="">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="shortcut icon" href="/favicon.ico?v=2">
+
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+        <link rel="stylesheet" href="/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="/css/main.css">
+
+        <script src="/js/vendor/modernizr-2.8.3.min.js"></script>
+
+    </head>
+
+    <body ng-controller="BudgetSelectionController">
+
+        <div class="container-fluid">
+
+            <div class="row-fluid">
+
+                <div class="col-lg-6 col-lg-offset-3">
+
+                    <div class="jumbotron col-lg-12">
+
+                        <div class="col-lg-4 col-lg-offset-4">
+
+                            <img src="/img/ynab_logo_2.png" style="width: 100%;" />
+
+                        </div>
+
+                        <div class="col-lg-12">
+
+                            <h2 class="text-align-center">
+
+                                You Need a Web Budget
+
+                            </h2>
+
+                            <p>
+
+                                Hi!
+
+                                I built this YNAB demo site specifically to send with my resume to the YNAB folks so don't plan on seeing this site stick around. It reads YNAB budgets from Dropbox accounts and gives a web interface into them. It's just a viewer for budgets. It's not feature complete like the desktop client, but it's still a neat demonstration. 
+
+                            </p>
+
+                            <p>
+
+                                Keep in mind I researched the YNAB data format and wrote this in less than two weeks after hours so expect to see some bugs.
+
+                            </p>
+
+                            <p>
+
+                                Without further ado, click the links below to log in with your Dropbox account or the Github button to view the full source. 
+
+                            </p>
+
+                        </div>
+
+                        <div class="col-lg-12">
+
+                            <p class="pull-right">
+
+                                <a href="mailto:jrmiller84@gmail.com">
+
+                                    James Miller
+
+                                </a>
+
+                            </p>
+
+                        </div>
+
+                        <div class="col-lg-12">
+                            
+                            &nbsp;
+
+                        </div>
+
+                        <div class="col-lg-12">
+
+                            <a class="btn btn-primary btn-lg col-lg-5" href="/auth">
+
+                                <i class="fa fa-dropbox"></i>
+
+                                Log In
+
+                            </a>
+
+                            <a class="btn btn-primary btn-lg col-lg-5 pull-right" href="https://github.com/jamesmillerio/YNAWB">
+
+                                <i class="fa fa-github"></i>
+
+                                View Source
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>        
+
+        <script src="/js/vendor/jquery-1.11.2.min.js"></script>
+
+        <script src="/js/vendor/bootstrap.min.js"></script>
+
+        <script src="/js/vendor/underscore-min.js"></script>
+
+        <script src="/js/vendor/angular.js"></script>
+
+        <script src="/js/vendor/angular-route.min.js"></script>
+
+        <script src="/js/main.js"></script>
+
+        <script src="/js/plugins.js"></script>
+
+        <script src="/js/services.js"></script>
+
+        <script src="/js/budgetselectioncontroller.js"></script>
+
+    </body>
+
+</html>

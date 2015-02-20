@@ -34,7 +34,25 @@
 
             <div class="row-fluid">
 
-                <div class="col-lg-4 col-lg-offset-4">
+                <div class="jumbotron col-lg-6 col-lg-offset-3" ng-hide="budgets">
+
+                    <h2>
+
+                        <i class="fa fa-spinner fa-spin"></i>
+
+                        Please wait...
+
+                    </h2>
+
+                    <p>
+
+                        We're grabbing your budgets.
+
+                    </p>
+
+                </div>
+
+                <div class="col-lg-4 col-lg-offset-4" ng-show="budgets">
 
                     <h3 class="text-align-center white">
 
@@ -72,7 +90,7 @@
 
                                     <li class="list-group-item">
 
-                                        <a href="/ynawb/#/budget/{{ budget.path }}/account/{{ device.deviceGuid }}">
+                                        <a href="/ynawb/#/budget/{{ budget.path }}/{{ device.deviceGuid }}/account/all">
                                             
                                             {{ device.name }}
 

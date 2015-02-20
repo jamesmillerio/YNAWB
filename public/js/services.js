@@ -1,11 +1,12 @@
 angular.module('YNAWB')
-    .service('BudgetDataService', ['$http', '$q', function($http, $q) {
+    .service('BudgetDataService', ['$http', '$q', '$routeParams', function($http, $q, $routeParams) {
 
         var self = this;
 
         self.budgetData = null;
         self.monthAbbr = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
         self.transformedBudgetData = null;
+        self.params = {};
 
         var formatYearMonth = function(year, month) {
 
@@ -298,12 +299,18 @@ angular.module('YNAWB')
 
         };
 
-        self.getBudgetData = function(accountId) {
+        self.getBudgetData = function(budget, device, accountId) {
 
             var deferred = $q.defer();
 
+            /* If we've specified "All" accounts in our querystring, just wipe out the
+             * account id. The code knows to treat null as "all." */
+            if(accountId != null && accountId.toLowerCase() == "all") {
+                accountId = null;
+            }
+
             if(self.budgetData == null) {
-                $http.get("/api/budgetdata")
+                $http.get("/api/budgetdata/" + budget + "/" + device)
                     .error(deferred.reject)
                     .success(function(b) {
 
@@ -416,11 +423,11 @@ angular.module('YNAWB')
 
         };
 
-        self.getBudgetDataForMonth = function(accountId, year, month) {
+        self.getBudgetDataForMonth = function(budget, device, accountId, year, month) {
 
             var deferred = $q.defer();
 
-            self.getBudgetData(accountId).then(function(b) {
+            self.getBudgetData(budget, device, accountId).then(function(b) {
                 
                 var summary             = getBudgetSummary(b);
                 var yearMonth           = formatYearMonth(year, month) + "-01";

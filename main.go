@@ -10,6 +10,7 @@ import (
 	"golang.org/x/oauth2"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 func main() {
@@ -155,11 +156,65 @@ func main() {
 	})
 
 	//Add our endpoint to get their YNAB data.
-	server.Get("/api/budgetdata", func(res http.ResponseWriter, req *http.Request) string {
+	server.Get("/api/budgetdata/:budget/:path", func(res http.ResponseWriter, req *http.Request, params martini.Params) string {
 
-		budget, _ := ioutil.ReadFile("/Users/james/Dropbox/YNAB/Bills Budget~5AB20D0F.ynab4/data1~F2813C02/E48B9F31-EAC7-302B-CAB4-4565B0E821FE/Budget.yfull")
+		session, _ := store.Get(req, "ynawb")
+		cookie := session.Values["token"]
 
-		return string(budget)
+		if token, ok := cookie.(string); ok {
+
+			db.SetAccessToken(token)
+
+			s, err := loadDropboxFile(".ynabSettings.yroot", db)
+
+			if err != nil && err.Error() != "EOF" {
+				handleError(err, res, req, config)
+			}
+
+			settings := LoadYNABSettings(s)
+			relativePath := ""
+
+			for _, p := range settings.RelativeKnownBudgets {
+
+				if strings.Contains(p, params["budget"]) {
+					relativePath = p
+				}
+
+			}
+
+			path := "/" + relativePath + "/"
+
+			fmt.Printf("Loading Budget.ymeta from: %v\n", path)
+
+			m, err := loadDropboxFile(path+"Budget.ymeta", db)
+
+			if err != nil && err.Error() != "EOF" {
+				handleError(err, res, req, config)
+			}
+
+			metadata := LoadYNABBudgetMetadata(m)
+
+			budget := path + metadata.RelativeDataFolderName + "/" + params["path"] + "/Budget.yfull"
+
+			fmt.Printf("OUR BUDGET PATH? %v\n", budget)
+
+			b, err := loadDropboxFile(budget, db)
+
+			if err != nil && err.Error() != "EOF" {
+				handleError(err, res, req, config)
+			}
+
+			res.Header().Set("Content-Type", "application/json")
+
+			return string(b)
+
+		} else {
+
+			http.Redirect(res, req, config.Server.HostName, 200)
+
+			return ""
+
+		}
 
 	})
 
@@ -170,10 +225,28 @@ func main() {
 
 func loadDropboxFile(path string, db *dropbox.Dropbox) ([]byte, error) {
 
-	closer, size, _ := db.Download(path, "", 0)
+	closer, size, err := db.Download(path, "", 0)
 
-	file := make([]byte, size)
-	_, err := closer.Read(file)
+	if err != nil {
+
+		fmt.Printf("Error loading dropbox file: %v\n", err)
+		return nil, err
+
+	} else {
+
+		fmt.Printf("File size: %v\n", size)
+		fmt.Printf("File contents: %v\n", closer)
+
+	}
+
+	/*if size <= 0 {
+		return nil, nil
+	}*/
+
+	file, err := ioutil.ReadAll(closer)
+
+	/*file := make([]byte, size)
+	_, err = closer.Read(file)*/
 
 	return file, err
 
