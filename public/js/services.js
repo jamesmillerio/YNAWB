@@ -303,7 +303,7 @@ angular.module('YNAWB')
             var deferred = $q.defer();
 
             if(self.budgetData == null) {
-                $http.get("/budgetdata")
+                $http.get("/api/budgetdata")
                     .error(deferred.reject)
                     .success(function(b) {
 
@@ -451,6 +451,19 @@ angular.module('YNAWB')
 
             return deferred.promise;
 
+        };
+
+        self.getBudgetList = function() {
+
+            var deferred = $q.defer();
+
+            $http.get("/api/budgets")
+                .error(deferred.reject)
+                .success(function(b) {
+                    deferred.resolve(b);
+                });
+
+            return deferred.promise;
         };
 
     }]);

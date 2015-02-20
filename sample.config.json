@@ -4,6 +4,8 @@
         "AppSecret": "YOUR APP SECRET HERE"
     },
     "Server": {
-        "WebRoot": "./public"
+        "WebRoot": "./public",
+        "SessionMaxAge": 900,
+        "HostName": "http://localhost:3000"
     }
 }

@@ -1,6 +1,7 @@
 angular.module('YNAWB') 
     .controller('BudgetController', ['$scope', '$routeParams', '$q', 'BudgetDataService', function($scope, $routeParams, $q, budgetDataService) {
 
+        debugger;
         $scope.accountId = $routeParams.account;
 
         budgetDataService.getBudgetData($scope.accountId)

@@ -1,0 +1,117 @@
+<!doctype html>
+
+<html class="no-js" lang="" ng-app="YNAWB">
+
+    <head>
+
+        <meta charset="utf-8">
+
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+        <title>You Need a Web Budget</title>
+
+        <meta name="description" content="">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="shortcut icon" href="/favicon.ico?v=2">
+
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+        <link rel="stylesheet" href="/css/font-awesome.min.css">
+
+        <link rel="stylesheet" href="/css/main.css">
+
+        <script src="/js/vendor/modernizr-2.8.3.min.js"></script>
+
+    </head>
+
+    <body ng-controller="BudgetSelectionController">
+
+        <div class="container-fluid">
+
+            <div class="row-fluid">
+
+                <div class="col-lg-4 col-lg-offset-4">
+
+                    <h3 class="text-align-center white">
+
+                        Select one of your budgets below.
+
+                    </h3>
+
+                    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                        
+                        <div class="panel panel-default" ng-repeat="budget in budgets | orderBy:title">
+                            
+                            <div class="panel-heading" role="tab" id="headingOne">
+                            
+                                <h4 class="panel-title">
+                            
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#{{ budget.id }}" aria-expanded="true" aria-controls="{{ budget.id }}">
+                            
+                                        {{ budget.title }}
+                            
+                                    </a>
+                            
+                                </h4>
+                            
+                            </div>
+
+                            <div id="{{ budget.id }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne" aria-expanded="false" >
+
+                                <div class="panel-body">
+                            
+                                    Select the device you've most recently used below. This web application isn't a device as far as the YNAB data format is concerned so we have to choose the one we want.
+
+                                </div>
+                            
+                                <ul class="list-group" ng-repeat="device in budget.devices" ng-repeat-end>
+
+                                    <li class="list-group-item">
+
+                                        <a href="/ynawb/#/budget/{{ budget.path }}/account/{{ device.deviceGuid }}">
+                                            
+                                            {{ device.name }}
+
+                                        </a>
+
+                                    </li>
+
+                                </ul>
+
+                            </div>
+
+                      </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>        
+
+        <script src="/js/vendor/jquery-1.11.2.min.js"></script>
+
+        <script src="/js/vendor/bootstrap.min.js"></script>
+
+        <script src="/js/vendor/underscore-min.js"></script>
+
+        <script src="/js/vendor/angular.js"></script>
+
+        <script src="/js/vendor/angular-route.min.js"></script>
+
+        <script src="/js/main.js"></script>
+
+        <script src="/js/plugins.js"></script>
+
+        <script src="/js/services.js"></script>
+
+        <script src="/js/budgetselectioncontroller.js"></script>
+
+    </body>
+
+</html>
