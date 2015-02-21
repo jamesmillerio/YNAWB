@@ -33,7 +33,7 @@ func main() {
 	}
 
 	//Configure Martini's port
-	server.RunOnAddr(":8080")
+	server.RunOnAddr(":80")
 
 	//Configure our Dropbox access
 	db.SetAppInfo(config.Dropbox.AppKey, config.Dropbox.AppSecret)
