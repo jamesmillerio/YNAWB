@@ -10,6 +10,7 @@ import (
 	"golang.org/x/oauth2"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -33,7 +34,7 @@ func main() {
 	}
 
 	//Configure Martini's port
-	server.RunOnAddr(":" + string(config.Server.Port))
+	server.RunOnAddr(":" + strconv.Itoa(config.Server.Port))
 
 	//Configure our Dropbox access
 	db.SetAppInfo(config.Dropbox.AppKey, config.Dropbox.AppSecret)
