@@ -16,6 +16,7 @@ type ServerConfiguration struct {
 	WebRoot       string
 	SessionMaxAge int
 	HostName      string
+	Port          int
 }
 
 type Configuration struct {
