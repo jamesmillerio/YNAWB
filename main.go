@@ -32,6 +32,9 @@ func main() {
 		},
 	}
 
+	//Configure Martini's port
+	server.RunOnAddr(":8080")
+
 	//Configure our Dropbox access
 	db.SetAppInfo(config.Dropbox.AppKey, config.Dropbox.AppSecret)
 
@@ -42,12 +45,9 @@ func main() {
 	//Redirects the users over to Dropbox for authentication
 	server.Get("/auth", func(res http.ResponseWriter, req *http.Request) string {
 
-		//Configure Dropbox
-
 		// Redirect user to consent page to ask for permission
 		// for the scopes specified above.
 		url := oAuthConf.AuthCodeURL("state")
-		//fmt.Printf("Visit the URL for the auth dialog: %v", url)
 
 		http.Redirect(res, req, url, http.StatusFound)
 
@@ -57,6 +57,14 @@ func main() {
 
 	//Accepts the response after authorizing via Dropbox
 	server.Get("/auth/response", func(res http.ResponseWriter, req *http.Request) {
+
+		authError := req.FormValue("error")
+
+		//If they cancelled their login, redirect them back to the home page.
+		if authError != "" {
+			http.Redirect(res, req, config.Server.HostName, http.StatusFound)
+			return
+		}
 
 		code := req.FormValue("code")
 		token, _ := oAuthConf.Exchange(nil, code)
@@ -78,8 +86,6 @@ func main() {
 
 		//Redirect them to a page where they can select their needed budget
 		http.Redirect(res, req, url, http.StatusFound)
-
-		//return string("Redirecting...")
 	})
 
 	//Present the list of budgest for the user to select. We're joining a bunch of JSON documents here.
@@ -184,8 +190,6 @@ func main() {
 
 			path := "/" + relativePath + "/"
 
-			fmt.Printf("Loading Budget.ymeta from: %v\n", path)
-
 			m, err := loadDropboxFile(path+"Budget.ymeta", db)
 
 			if err != nil && err.Error() != "EOF" {
@@ -195,8 +199,6 @@ func main() {
 			metadata := LoadYNABBudgetMetadata(m)
 
 			budget := path + metadata.RelativeDataFolderName + "/" + params["path"] + "/Budget.yfull"
-
-			fmt.Printf("OUR BUDGET PATH? %v\n", budget)
 
 			b, err := loadDropboxFile(budget, db)
 
@@ -225,28 +227,16 @@ func main() {
 
 func loadDropboxFile(path string, db *dropbox.Dropbox) ([]byte, error) {
 
-	closer, size, err := db.Download(path, "", 0)
+	closer, _, err := db.Download(path, "", 0)
 
 	if err != nil {
 
 		fmt.Printf("Error loading dropbox file: %v\n", err)
 		return nil, err
 
-	} else {
-
-		fmt.Printf("File size: %v\n", size)
-		fmt.Printf("File contents: %v\n", closer)
-
 	}
 
-	/*if size <= 0 {
-		return nil, nil
-	}*/
-
 	file, err := ioutil.ReadAll(closer)
-
-	/*file := make([]byte, size)
-	_, err = closer.Read(file)*/
 
 	return file, err
 

@@ -238,7 +238,7 @@ angular.module('YNAWB')
                         var isDeferred = false;
                         var isInCategory = false;
 
-                        if(sb.categoryId == "Category/__Split__") {
+                        if(sb.categoryId == "Category/__Split__" && sb.subCategories != null && sb.subCategories.length > 0) {
                             
                             isInCategory = _.find(t.subTransactions, function(st) { 
 
@@ -356,6 +356,7 @@ angular.module('YNAWB')
                         b.masterCategories  = _.chain(b.masterCategories)
                             .filter(removeTombstones)
                             .filter(removeHidden)
+                            .filter(function(c) { return c.hasOwnProperty("subCategories") && c.subCategories != null && c.subCategories.length > 0; })
                             .map(function(c) {
 
                                 if(c.hasOwnProperty("subCategories") && c.subCategories != null) {
@@ -432,10 +433,10 @@ angular.module('YNAWB')
                 var summary             = getBudgetSummary(b);
                 var yearMonth           = formatYearMonth(year, month) + "-01";
                 var income              = incomeForMonth(year, month, b);
-                var budgeted            = _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
+                var budgeted            = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
                 var availableToBudget   = (budgeted > income) ? budgeted - income : 0;
-                var outflows            = _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
-                var balance             = _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.runningBudget + b.runningOutflow; }, 0);
+                var outflows            = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
+                var balance             = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.runningBudget + b.runningOutflow; }, 0);
 
                 deferred.resolve({
                     summary: {
