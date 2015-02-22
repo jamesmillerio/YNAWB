@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/gorilla/securecookie"
-	"log"
-	//"github.com/martini-contrib/secure"
+	"github.com/martini-contrib/secure"
 	"github.com/martini-contrib/sessions"
 	"github.com/stacktic/dropbox"
 	"github.com/unrolled/render"
 	"golang.org/x/oauth2"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -22,8 +22,9 @@ func main() {
 	config := LoadConfiguration("./config.json")
 	auth, encrypt := securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32)
 	store := sessions.NewCookieStore(auth, encrypt)
-	server := martini.Classic()
+	server := martini.New()
 	db := dropbox.NewDropbox()
+	router := martini.NewRouter()
 	r := render.New()
 	oAuthConf := &oauth2.Config{
 		ClientID:     config.Dropbox.AppKey,
@@ -35,18 +36,27 @@ func main() {
 		},
 	}
 
-	//Configure Martini's port
-	//server.RunOnAddr(":" + strconv.Itoa(config.Server.Port))
-
 	//Configure our Dropbox access
 	db.SetAppInfo(config.Dropbox.AppKey, config.Dropbox.AppSecret)
 
 	//Set our public web root and our session storage.
+	server.Use(martini.Logger())
+	server.Use(martini.Recovery())
 	server.Use(martini.Static(config.Server.WebRoot))
 	server.Use(sessions.Sessions("ynawb", store))
 
+	//Configure the Martini router
+	server.MapTo(router, (*martini.Routes)(nil))
+	server.Action(router.Handle)
+
+	//Configure our secure options
+	server.Use(secure.Secure(secure.Options{
+		SSLRedirect: true,
+		SSLHost:     config.Server.HostName + ":" + strconv.Itoa(config.Server.Port),
+	}))
+
 	//Redirects the users over to Dropbox for authentication
-	server.Get("/auth", func(res http.ResponseWriter, req *http.Request) string {
+	router.Get("/auth", func(res http.ResponseWriter, req *http.Request) string {
 
 		// Redirect user to consent page to ask for permission
 		// for the scopes specified above.
@@ -59,7 +69,7 @@ func main() {
 	})
 
 	//Accepts the response after authorizing via Dropbox
-	server.Get("/auth/response", func(res http.ResponseWriter, req *http.Request) {
+	router.Get("/auth/response", func(res http.ResponseWriter, req *http.Request) {
 
 		authError := req.FormValue("error")
 
@@ -92,7 +102,7 @@ func main() {
 	})
 
 	//Present the list of budgest for the user to select. We're joining a bunch of JSON documents here.
-	server.Get("/api/budgets", func(res http.ResponseWriter, req *http.Request) {
+	router.Get("/api/budgets", func(res http.ResponseWriter, req *http.Request) {
 
 		session, _ := store.Get(req, "ynawb")
 		cookie := session.Values["token"]
@@ -165,7 +175,7 @@ func main() {
 	})
 
 	//Add our endpoint to get their YNAB data.
-	server.Get("/api/budgetdata/:budget/:path", func(res http.ResponseWriter, req *http.Request, params martini.Params) string {
+	router.Get("/api/budgetdata/:budget/:path", func(res http.ResponseWriter, req *http.Request, params martini.Params) string {
 
 		session, _ := store.Get(req, "ynawb")
 		cookie := session.Values["token"]
@@ -228,7 +238,11 @@ func main() {
 
 		fmt.Printf("Starting SSL on port %v using cert %v and key %v.\n", config.Server.Port, config.Server.CertificatePath, config.Server.KeyPath)
 
-		err := http.ListenAndServeTLS(":"+strconv.Itoa(config.Server.Port), config.Server.CertificatePath, config.Server.KeyPath, nil)
+		err := http.ListenAndServeTLS(
+			":"+strconv.Itoa(config.Server.Port),
+			config.Server.CertificatePath,
+			config.Server.KeyPath,
+			server)
 
 		if err != nil {
 			log.Fatal(err)
