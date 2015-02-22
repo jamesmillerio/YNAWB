@@ -36,7 +36,7 @@ func main() {
 	}
 
 	//Configure Martini's port
-	server.RunOnAddr(":" + strconv.Itoa(config.Server.Port))
+	//server.RunOnAddr(":" + strconv.Itoa(config.Server.Port))
 
 	//Configure our Dropbox access
 	db.SetAppInfo(config.Dropbox.AppKey, config.Dropbox.AppSecret)
@@ -226,7 +226,7 @@ func main() {
 	//Start the server. Use SSL if denoted in our config.s
 	if config.Server.CertificatePath != "" && config.Server.KeyPath != "" {
 
-		fmt.Printf("Starting SSL on port %v using cert %v and key %v.", config.Server.Port, config.Server.CertificatePath, config.Server.KeyPath)
+		fmt.Printf("Starting SSL on port %v using cert %v and key %v.\n", config.Server.Port, config.Server.CertificatePath, config.Server.KeyPath)
 
 		err := http.ListenAndServeTLS(":"+strconv.Itoa(config.Server.Port), config.Server.CertificatePath, config.Server.KeyPath, nil)
 
