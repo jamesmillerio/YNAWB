@@ -51,6 +51,25 @@ func main() {
 	server.MapTo(router, (*martini.Routes)(nil))
 	server.Action(router.Handle)
 
+	//Manually serve the main index file so it will reidirect to HTTPS.
+	router.Get("/index.html", func(res http.ResponseWriter, req *http.Request) string {
+
+		root := config.Server.WebRoot
+
+		if !strings.HasSuffix(root, "/") {
+			root += "/"
+		}
+
+		file, err := ioutil.ReadFile(root + "/index.html")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return string(file)
+
+	})
+
 	//Redirects the users over to Dropbox for authentication
 	router.Get("/auth", func(res http.ResponseWriter, req *http.Request) string {
 
@@ -246,24 +265,6 @@ func main() {
 
 	server.RunOnAddr(":" + strconv.Itoa(config.Server.PortSSL))
 	server.Run()
-
-	//Start the server. Use SSL if denoted in our config.s
-	/*if config.Server.CertificatePath != "" && config.Server.KeyPath != "" {
-
-		fmt.Printf("Starting SSL on port %v using cert %v and key %v.\n", config.Server.Port, config.Server.CertificatePath, config.Server.KeyPath)
-
-		// HTTPS
-		err := http.ListenAndServeTLS(
-			":"+strconv.Itoa(config.Server.Port),
-			config.Server.CertificatePath,
-			config.Server.KeyPath,
-			server)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-	}*/
 
 }
 
