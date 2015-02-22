@@ -242,13 +242,6 @@ func main() {
 
 		fmt.Printf("Starting SSL on port %v using cert %v and key %v.\n", config.Server.Port, config.Server.CertificatePath, config.Server.KeyPath)
 
-		// HTTP
-		go func() {
-			if err := http.ListenAndServe(":80", server); err != nil {
-				log.Fatal(err)
-			}
-		}()
-
 		// HTTPS
 		err := http.ListenAndServeTLS(
 			":"+strconv.Itoa(config.Server.Port),
@@ -260,11 +253,14 @@ func main() {
 			log.Fatal(err)
 		}
 
-	} else {
-
-		server.Run()
-
 	}
+
+	// HTTP
+	go func() {
+		if err := http.ListenAndServe(":80", server); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 }
 
