@@ -244,7 +244,7 @@ func main() {
 
 		// HTTP
 		go func() {
-			if err := http.ListenAndServe(":8080", server); err != nil {
+			if err := http.ListenAndServe(":80", server); err != nil {
 				log.Fatal(err)
 			}
 		}()
