@@ -17,6 +17,7 @@ type ServerConfiguration struct {
 	SessionMaxAge   int
 	HostName        string
 	Port            int
+	PortSSL         int
 	CertificatePath string
 	KeyPath         string
 }

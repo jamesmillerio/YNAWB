@@ -236,13 +236,19 @@ func main() {
 
 	// HTTP
 	go func() {
-		if err := http.ListenAndServe(":80", server); err != nil {
+
+		if err := http.ListenAndServe(":"+strconv.Itoa(config.Server.Port), server); err != nil {
 			log.Fatal(err)
+		} else {
+			fmt.Printf("Listing on port :%v\n", config.Server.Port)
 		}
 	}()
 
+	server.RunOnAddr(":" + strconv.Itoa(config.Server.PortSSL))
+	server.Run()
+
 	//Start the server. Use SSL if denoted in our config.s
-	if config.Server.CertificatePath != "" && config.Server.KeyPath != "" {
+	/*if config.Server.CertificatePath != "" && config.Server.KeyPath != "" {
 
 		fmt.Printf("Starting SSL on port %v using cert %v and key %v.\n", config.Server.Port, config.Server.CertificatePath, config.Server.KeyPath)
 
@@ -257,7 +263,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-	}
+	}*/
 
 }
 
