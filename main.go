@@ -18,6 +18,8 @@ import (
 
 func main() {
 
+	martini.Env = martini.Prod
+
 	//Load our config information and start our web server.
 	config := LoadConfiguration("./config.json")
 	auth, encrypt := securecookie.GenerateRandomKey(64), securecookie.GenerateRandomKey(32)
