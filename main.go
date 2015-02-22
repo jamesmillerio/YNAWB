@@ -51,14 +51,6 @@ func main() {
 	server.MapTo(router, (*martini.Routes)(nil))
 	server.Action(router.Handle)
 
-	fmt.Printf("SSL Host: %v\n", config.Server.HostName+":"+strconv.Itoa(config.Server.Port))
-
-	//Configure our secure options
-	server.Use(secure.Secure(secure.Options{
-		SSLRedirect: true,
-		SSLHost:     config.Server.HostName + ":" + strconv.Itoa(config.Server.Port),
-	}))
-
 	//Redirects the users over to Dropbox for authentication
 	router.Get("/auth", func(res http.ResponseWriter, req *http.Request) string {
 
@@ -236,6 +228,12 @@ func main() {
 		}
 
 	})
+
+	//Configure our secure options
+	server.Use(secure.Secure(secure.Options{
+		SSLRedirect: true,
+		SSLHost:     config.Server.HostName + ":" + strconv.Itoa(config.Server.Port),
+	}))
 
 	// HTTP
 	go func() {
