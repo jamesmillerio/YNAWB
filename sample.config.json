@@ -7,6 +7,8 @@
         "WebRoot": "./public",
         "SessionMaxAge": 900,
         "HostName": "http://localhost:3000",
-        "Port": 80
+        "Port": 80,
+        "CertificatePath": "",
+        "KeyPath": ""
     }
 }

@@ -13,10 +13,12 @@ type DropboxConfiguration struct {
 }
 
 type ServerConfiguration struct {
-	WebRoot       string
-	SessionMaxAge int
-	HostName      string
-	Port          int
+	WebRoot         string
+	SessionMaxAge   int
+	HostName        string
+	Port            int
+	CertificatePath string
+	KeyPath         string
 }
 
 type Configuration struct {

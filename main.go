@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/gorilla/securecookie"
+	"log"
+	//"github.com/martini-contrib/secure"
 	"github.com/martini-contrib/sessions"
 	"github.com/stacktic/dropbox"
 	"github.com/unrolled/render"
@@ -221,8 +223,22 @@ func main() {
 
 	})
 
-	//Start the server
-	server.Run()
+	//Start the server. Use SSL if denoted in our config.s
+	if config.Server.CertificatePath != "" && config.Server.KeyPath != "" {
+
+		fmt.Printf("Starting SSL on port %v using cert %v and key %v.", config.Server.Port, config.Server.CertificatePath, config.Server.KeyPath)
+
+		err := http.ListenAndServeTLS(":"+strconv.Itoa(config.Server.Port), config.Server.CertificatePath, config.Server.KeyPath, nil)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	} else {
+
+		server.Run()
+
+	}
 
 }
 
