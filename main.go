@@ -237,6 +237,13 @@ func main() {
 
 	})
 
+	// HTTP
+	go func() {
+		if err := http.ListenAndServe(":80", server); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	//Start the server. Use SSL if denoted in our config.s
 	if config.Server.CertificatePath != "" && config.Server.KeyPath != "" {
 
@@ -254,13 +261,6 @@ func main() {
 		}
 
 	}
-
-	// HTTP
-	go func() {
-		if err := http.ListenAndServe(":80", server); err != nil {
-			log.Fatal(err)
-		}
-	}()
 
 }
 
