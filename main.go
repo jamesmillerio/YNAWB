@@ -51,6 +51,8 @@ func main() {
 	server.MapTo(router, (*martini.Routes)(nil))
 	server.Action(router.Handle)
 
+	fmt.Printf("SSL Host: %v\n", config.Server.HostName+":"+strconv.Itoa(config.Server.Port))
+
 	//Configure our secure options
 	server.Use(secure.Secure(secure.Options{
 		SSLRedirect: true,
