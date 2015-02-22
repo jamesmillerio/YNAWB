@@ -56,7 +56,7 @@ func main() {
 	//Configure our secure options
 	server.Use(secure.Secure(secure.Options{
 		SSLRedirect: true,
-		SSLHost:     config.Server.HostName + ":" + strconv.Itoa(config.Server.Port),
+		//SSLHost:     config.Server.HostName + ":" + strconv.Itoa(config.Server.Port),
 	}))
 
 	//Redirects the users over to Dropbox for authentication
