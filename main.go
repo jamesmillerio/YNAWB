@@ -66,6 +66,8 @@ func main() {
 			url.Scheme = "https"
 			url.Host = req.Host
 
+			fmt.Printf("Redirecting to: %v\n", url.String())
+
 			http.Redirect(res, req, url.String(), http.StatusFound)
 
 		} else {
@@ -73,6 +75,8 @@ func main() {
 			// Redirect user to consent page to ask for permission
 			// for the scopes specified above.
 			url := oAuthConf.AuthCodeURL("state")
+
+			fmt.Printf("Redirecting to: %v\n", url)
 
 			http.Redirect(res, req, url, http.StatusFound)
 		}
