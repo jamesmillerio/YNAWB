@@ -48,7 +48,7 @@
 
                                             <i class="fa fa-tags budget-icon-color"></i> 
 
-                                            <a href="#/budget/{{ budget }}/{{ device }}/account/{{ defaultAccount.entityId }}" class="white">
+                                            <a href="#/budget/{{ params.budget }}/{{ params.device }}/account/{{ params.defaultAccount.entityId }}" class="white">
                                                 
                                                 Budget
 
@@ -68,7 +68,7 @@
 
                                             <i class="fa fa-line-chart reports-icon-color"></i> 
 
-                                                <a class="white" href="#/reports/{{ budgetFile }}/{{ device }}/account/{{ defaultAccount.entityId }}">
+                                                <a class="white" href="#/reports/{{ params.budget }}/{{ params.device }}/account/{{ params.defaultAccount.entityId }}">
 
                                                     Reports
 
@@ -88,7 +88,7 @@
 
                                             <i class="fa fa-bank all-accounts-icon-color"></i>
 
-                                                <a class="white" href="#/transactions/{{ budget }}/{{ device }}/account/all">
+                                                <a class="white" href="#/transactions/{{ params.budget }}/{{ params.device }}/account/all">
 
                                                     All Accounts
 
@@ -120,9 +120,9 @@
 
                                     </h4>
 
-                                    <h5 class="margin-left-l shadow-dark" ng-repeat="account in accounts">
+                                    <h5 class="margin-left-l shadow-dark" ng-repeat="account in params.accounts">
 
-                                        <a class="white" href="#/transactions/{{ budget }}/{{ device }}/account/{{ account.entityId }}">
+                                        <a class="white" href="#/transactions/{{ params.budget }}/{{ params.device }}/account/{{ account.entityId }}">
 
                                             {{ account.accountName }}
 

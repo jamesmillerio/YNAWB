@@ -3,7 +3,11 @@ angular.module('YNAWB')
 
         $scope.transactions = null;
 
-        budgetDataService.getBudgetData()
+        $scope.budget = $routeParams.budget;
+        $scope.device = $routeParams.device;
+        $scope.accountId = $routeParams.account;
+
+        budgetDataService.getBudgetData($scope.budget, $scope.device, $scope.accountId)
             .then(function(b) {
 
                 //Set our needed scope variables.

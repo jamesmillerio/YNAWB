@@ -20,6 +20,10 @@ angular.module('YNAWB')
                 $scope.masterCategories = b.masterCategories;
                 $scope.budgetData = [];
 
+                //Set some of our data service variables for the SummaryController to pick up.
+                $scope.params.accounts = b.accounts;
+                $scope.params.defaultAccount = _.first(b.accounts);
+
                 //Just in case we decide to add more columns in the future, use a loop.
                 for(var i = 1; i <= neededMonthCount; i++) {
                     var p = budgetDataService.getBudgetDataForMonth($scope.params.budget, $scope.params.device, $scope.accountId, year, month + i);

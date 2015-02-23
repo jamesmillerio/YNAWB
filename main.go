@@ -59,7 +59,9 @@ func main() {
 		 * any of our main files own't get redirected. Because of that, we're
 		 * going to redirect people when they go to auth their Dropbox
 		 * accounts. This should fix the issue. */
-		if strings.ToLower(req.URL.Scheme) == "http" {
+		if strings.ToLower(req.URL.Scheme) == "http" && strings.ToLower(req.URL.Host) != "localhost" {
+
+			fmt.Printf("Redirecting to SSL...\n")
 
 			url := req.URL
 			url.Scheme = "https"
@@ -68,6 +70,8 @@ func main() {
 			http.Redirect(res, req, url.String(), http.StatusFound)
 
 		} else {
+
+			fmt.Printf("Redirecting to Dropbox...\n")
 
 			// Redirect user to consent page to ask for permission
 			// for the scopes specified above.
@@ -186,6 +190,15 @@ func main() {
 
 	//Add our endpoint to get their YNAB data.
 	router.Get("/api/budgetdata/:budget/:path", func(res http.ResponseWriter, req *http.Request, params martini.Params) string {
+
+		//Do some checks on our parameters
+		if params["budget"] == "" || params["budget"] == "undefined" {
+			return ""
+		}
+
+		if params["path"] == "" || params["path"] == "undefined" {
+			return ""
+		}
 
 		session, _ := store.Get(req, "ynawb")
 		cookie := session.Values["token"]
