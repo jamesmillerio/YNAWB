@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-martini/martini"
 	"github.com/gorilla/securecookie"
-	"github.com/martini-contrib/secure"
 	"github.com/martini-contrib/sessions"
 	"github.com/stacktic/dropbox"
 	"github.com/unrolled/render"
@@ -249,11 +248,6 @@ func main() {
 		}
 
 	})
-
-	//Configure our secure options
-	server.Use(secure.Secure(secure.Options{
-		SSLRedirect: true,
-	}))
 
 	// HTTP
 	go func() {
