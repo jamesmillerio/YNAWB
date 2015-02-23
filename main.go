@@ -52,7 +52,7 @@ func main() {
 	server.Action(router.Handle)
 
 	//Manually serve the main index file so it will reidirect to HTTPS.
-	router.Get("/index.html", func(res http.ResponseWriter, req *http.Request) string {
+	/*router.Get("/index.html", func(res http.ResponseWriter, req *http.Request) string {
 
 		root := config.Server.WebRoot
 
@@ -68,7 +68,7 @@ func main() {
 
 		return string(file)
 
-	})
+	})*/
 
 	//Redirects the users over to Dropbox for authentication
 	router.Get("/auth", func(res http.ResponseWriter, req *http.Request) string {
