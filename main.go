@@ -47,7 +47,7 @@ func main() {
 	//server.Use(martini.Static(config.Server.WebRoot))
 	server.Use(sessions.Sessions("ynawb", store))
 
-	static := martini.Static(config.Server.WebRoot, martini.StaticOptions{Fallback: "/index.html"})
+	static := martini.Static(config.Server.WebRoot, martini.StaticOptions{Fallback: config.Server.WebRoot + "/index.html"})
 	router.NotFound(static, http.NotFound)
 
 	//Configure the Martini router
