@@ -36,6 +36,11 @@ angular.module('YNAWB')
                         $scope.budgetData = _.sortBy(budgets, function(b) { return b.summary.date; });;
                     });
 
+            }, function() {
+                //Something happened while requesting our budget data.
+
+                //Redirect to our error page.
+                window.location.href = "/error.html";
             });
 
     }]);

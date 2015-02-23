@@ -43,8 +43,10 @@ func main() {
 	//Set our public web root and our session storage.
 	server.Use(martini.Logger())
 	server.Use(martini.Recovery())
-	server.Use(martini.Static(config.Server.WebRoot))
 	server.Use(sessions.Sessions("ynawb", store))
+	server.Use(martini.Static(config.Server.WebRoot, martini.StaticOptions{
+		Fallback: config.Server.ErrorFile,
+	}))
 
 	//Configure the Martini router
 	server.MapTo(router, (*martini.Routes)(nil))
@@ -85,17 +87,35 @@ func main() {
 	//Accepts the response after authorizing via Dropbox
 	router.Get("/auth/response", func(res http.ResponseWriter, req *http.Request) {
 
-		authError := req.FormValue("error")
-
 		//If they cancelled their login, redirect them back to the home page.
-		if authError != "" {
+		if authError := req.FormValue("error"); authError != "" {
 			http.Redirect(res, req, config.Server.HostName, http.StatusFound)
 			return
 		}
 
 		code := req.FormValue("code")
-		token, _ := oAuthConf.Exchange(nil, code)
-		session, _ := store.Get(req, "ynawb")
+
+		//If we didn't somehow get an authentication code, take them back home.
+		if code == "" {
+			http.Redirect(res, req, config.Server.HostName, http.StatusFound)
+			return
+		}
+
+		token, err := oAuthConf.Exchange(nil, code)
+
+		//If our token exchange doesn't work, throw an error and go to our error page.
+		if err != nil {
+			handleError(err, res, req, config)
+			return
+		}
+
+		session, err := store.Get(req, "ynawb")
+
+		//If we can't get our session store, throw an error and go to our error page.
+		if err != nil {
+			handleError(err, res, req, config)
+			return
+		}
 
 		//Set our dropbox session token and save.
 		session.Options.HttpOnly = true
@@ -125,9 +145,7 @@ func main() {
 
 			db.SetAccessToken(token)
 
-			file, err := loadDropboxFile("/.ynabSettings.yroot", db)
-
-			if err != nil && err.Error() != "EOF" {
+			if file, err := loadDropboxFile("/.ynabSettings.yroot", db); err != nil && err.Error() != "EOF" {
 
 				handleError(err, res, req, config)
 
@@ -142,6 +160,7 @@ func main() {
 
 					if err != nil && err.Error() != "EOF" {
 						handleError(err, res, req, config)
+						return
 					}
 
 					metadata := LoadYNABBudgetMetadata(bm)
@@ -150,6 +169,7 @@ func main() {
 
 					if err != nil && err.Error() != "EOF" {
 						handleError(err, res, req, config)
+						return
 					}
 
 					devicesCollection := make([]map[string]string, len(entries))
@@ -183,6 +203,7 @@ func main() {
 		} else {
 
 			http.Redirect(res, req, config.Server.HostName, 200)
+			return
 
 		}
 
@@ -293,6 +314,15 @@ func handleError(err error, res http.ResponseWriter, req *http.Request, config C
 	//Print errors
 	fmt.Printf("Error: %v\n", err)
 
+	//Get our error file
+	url := config.Server.HostName
+
+	if !strings.HasPrefix(config.Server.ErrorFile, "/") {
+		url += "/"
+	}
+
+	url += config.Server.ErrorFile
+
 	//There's been an error redirect to the home page.
-	http.Redirect(res, req, config.Server.HostName, http.StatusFound)
+	http.Redirect(res, req, url, http.StatusInternalServerError)
 }

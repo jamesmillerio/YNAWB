@@ -9,6 +9,7 @@
         "HostName": "http://localhost:3000",
         "Port": 80,
         "CertificatePath": "",
-        "KeyPath": ""
+        "KeyPath": "",
+        "ErrorFile": "/error.html"
     }
 }

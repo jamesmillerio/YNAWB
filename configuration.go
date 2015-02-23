@@ -20,6 +20,7 @@ type ServerConfiguration struct {
 	PortSSL         int
 	CertificatePath string
 	KeyPath         string
+	ErrorFile       string
 }
 
 type Configuration struct {
