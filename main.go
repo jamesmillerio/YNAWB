@@ -44,31 +44,15 @@ func main() {
 	//Set our public web root and our session storage.
 	server.Use(martini.Logger())
 	server.Use(martini.Recovery())
-	server.Use(martini.Static(config.Server.WebRoot))
+	//server.Use(martini.Static(config.Server.WebRoot))
 	server.Use(sessions.Sessions("ynawb", store))
+
+	static := martini.Static(config.Server.WebRoot, martini.StaticOptions{Fallback: "/index.html"})
+	router.NotFound(static, http.NotFound)
 
 	//Configure the Martini router
 	server.MapTo(router, (*martini.Routes)(nil))
 	server.Action(router.Handle)
-
-	//Manually serve the main index file so it will reidirect to HTTPS.
-	/*router.Get("/index.html", func(res http.ResponseWriter, req *http.Request) string {
-
-		root := config.Server.WebRoot
-
-		if !strings.HasSuffix(root, "/") {
-			root += "/"
-		}
-
-		file, err := ioutil.ReadFile(root + "/index.html")
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		return string(file)
-
-	})*/
 
 	//Redirects the users over to Dropbox for authentication
 	router.Get("/auth", func(res http.ResponseWriter, req *http.Request) string {
