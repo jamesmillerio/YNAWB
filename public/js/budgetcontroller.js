@@ -11,7 +11,7 @@ angular.module('YNAWB')
             .then(function(b) {
 
                 var neededMonthCount = 3;
-                var dt = new Date(2014, 7, 1);
+                var dt = new Date();
                 var year = dt.getFullYear();
                 var month = dt.getMonth();
                 var promises = [];
