@@ -53,7 +53,6 @@ func main() {
 	//Redirects the users over to Dropbox for authentication
 	router.Get("/auth", func(res http.ResponseWriter, req *http.Request) {
 
-		fmt.Printf("HERE WE GO SERVING /AUTH")
 		/* So, this is a weird edge case. Because we're serving most
 		 * of our app via the static files handler and the HTTPS redirect
 		 * in the martinin-contrib/secure package only works for defined routes,
@@ -62,8 +61,6 @@ func main() {
 		 * accounts. This should fix the issue. */
 		if strings.ToLower(req.URL.Scheme) == "http" && strings.ToLower(req.URL.Host) != "localhost" {
 
-			fmt.Printf("Redirecting to SSL...\n")
-
 			url := req.URL
 			url.Scheme = "https"
 			url.Host = req.Host
@@ -71,8 +68,6 @@ func main() {
 			http.Redirect(res, req, url.String(), http.StatusFound)
 
 		} else {
-
-			fmt.Printf("Redirecting to Dropbox...\n")
 
 			// Redirect user to consent page to ask for permission
 			// for the scopes specified above.
