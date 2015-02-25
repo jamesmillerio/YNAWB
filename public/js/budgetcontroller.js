@@ -10,13 +10,13 @@ angular.module('YNAWB')
         budgetDataService.getBudgetData($scope.params.budget, $scope.params.device, $scope.params.accountId)
             .then(function(b) {
 
-                var neededMonthCount = 3;
                 var dt = new Date();
                 var year = dt.getFullYear();
                 var month = dt.getMonth();
                 var promises = [];
 
                 //Set our needed scope variables.
+                $scope.neededMonths = 3;
                 $scope.masterCategories = b.masterCategories;
                 $scope.budgetData = [];
 
@@ -25,7 +25,7 @@ angular.module('YNAWB')
                 $scope.params.defaultAccount = _.first(b.accounts);
 
                 //Just in case we decide to add more columns in the future, use a loop.
-                for(var i = 1; i <= neededMonthCount; i++) {
+                for(var i = 1; i <= $scope.neededMonths; i++) {
                     var p = budgetDataService.getBudgetDataForMonth($scope.params.budget, $scope.params.device, $scope.accountId, year, month + i);
                     promises.push(p);
                 }
