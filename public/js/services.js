@@ -206,6 +206,7 @@ angular.module('YNAWB')
             
             var budgetRecord = {};
             var outflowRecord = {};
+            var groupedTransactions = _.groupBy(fullBudget.transactions, function(t) { return t.date.substring(0, 7); });
             var groupedBudgets = _.map(fullBudget.monthlyBudgets, function(b) {
 
                 // Now we want to group by the budget category. This is so 
@@ -229,67 +230,89 @@ angular.module('YNAWB')
 
                 }
 
-                b.monthlySubCategoryBudgets = _.map(b.monthlySubCategoryBudgets, function(sb) {
+                b.monthlySubCategoryBudgets  = _.chain(b.monthlySubCategoryBudgets)
+                                                .map(function(sb) {
 
-                    sb.transactions = _.filter(fullBudget.transactions, function(t) {
+                                                    var trans = (groupedTransactions[yearMonth] == null) ? [] : groupedTransactions[yearMonth];
 
-                        var isInMonth = t.date.indexOf(yearMonth) == 0;
-                        var isInPriorMonth = t.date.indexOf(priorYearMonth) == 0;
-                        var isDeferred = false;
-                        var isInCategory = false;
+                                                    //sb.transactions = _.filter(fullBudget.transactions, function(t) {
+                                                    sb.transactions = _.filter(trans, function(t) {
 
-                        if(sb.categoryId == "Category/__Split__" && sb.subCategories != null && sb.subCategories.length > 0) {
-                            
-                            isInCategory = _.find(t.subTransactions, function(st) { 
+                                                        var isInMonth = t.date.indexOf(yearMonth) == 0;
+                                                        var isInPriorMonth = t.date.indexOf(priorYearMonth) == 0;
+                                                        var isDeferred = false;
+                                                        var isInCategory = false;
 
-                                if(isInPriorMonth && st.categoryId == "Category/__DeferredIncome__") {
-                                    isDeferred = true;
-                                }
+                                                        if(t.categoryId == "Category/__Split__" && t.subTransactions != null && t.subTransactions.length > 0) {
+                                                            
+                                                            isInCategory = _.find(t.subTransactions, function(st) { 
 
-                                return st.categoryId == sb.categoryId;
+                                                                if(isInPriorMonth && st.categoryId == "Category/__DeferredIncome__") {
+                                                                    isDeferred = true;
+                                                                }
 
-                            }) != null;
+                                                                return st.categoryId == sb.categoryId;
 
-                            return isInCategory && (isInMonth || isDeferred);                            
+                                                            }) != null;
 
-                        } else {
-                            
-                            isDeferred = isInPriorMonth && t.categoryId == "Category/__DeferredIncome__";
-                            isInCategory = t.categoryId == sb.categoryId;
+                                                            return isInCategory && (isInMonth || isDeferred);                            
 
-                        }
+                                                        } else {
+                                                            
+                                                            isDeferred = isInPriorMonth && t.categoryId == "Category/__DeferredIncome__";
+                                                            isInCategory = t.categoryId == sb.categoryId;
 
-                        return isInCategory && (isInMonth || isDeferred);
+                                                        }
 
-                    });
+                                                        return isInCategory && (isInMonth || isDeferred);
 
-                    var outflows = _.filter(sb.transactions, function(t) { return t.amount < 0; });
+                                                    });
 
-                    sb.outflowAmount = _.reduce(outflows, function(memo, t) { return memo + t.amount}, 0);
-                    sb.name = getBudgetName(sb.categoryId, fullBudget);
-                    sb.sortableIndex = getCategorySortIndex(sb.categoryId, fullBudget);
+                                                    sb.outflowAmount = _.reduce(sb.transactions, function(m1, t) { 
 
-                    //Record keeping for each budget/outflow.
-                    if(!budgetRecord.hasOwnProperty(sb.categoryId))
-                        budgetRecord[sb.categoryId] = 0;
+                                                        var amount = 0;
 
-                    if(!outflowRecord.hasOwnProperty(sb.categoryId))
-                        outflowRecord[sb.categoryId] = 0;
+                                                        if(t.hasOwnProperty("subTransactions") && t.subTransactions != null && t.subTransactions.length > 0) {
 
-                    //Keep our running total
-                    budgetRecord[sb.categoryId] += sb.budgeted;
-                    outflowRecord[sb.categoryId] += sb.outflowAmount;
+                                                            amount = _.chain(t.subTransactions)
+                                                                      .filter(function(st) { return st.categoryId === sb.categoryId; })
+                                                                      .filter(function(st) { return st.amount < 0; })
+                                                                      .reduce(function(m2, st) { return m2 + st.amount; }, 0)
+                                                                      .value();
 
-                    //Set the running total locally
-                    sb.runningBudget = budgetRecord[sb.categoryId];
-                    sb.runningOutflow = outflowRecord[sb.categoryId];
-                    sb.runningDifference = sb.runningBudget + sb.runningOutflow;
+                                                        } else {
+                                                            //amount = (t.amount < 0) ? t.amount : 0;
+                                                            amount = t.amount;
+                                                        }
 
-                    return sb;
+                                                        return m1 + amount;
 
-                });
+                                                    }, 0);
 
-                b.monthlySubCategoryBudgets = _.indexBy(b.monthlySubCategoryBudgets, function(sb) { return sb.categoryId; });
+                                                    sb.name = getBudgetName(sb.categoryId, fullBudget);
+                                                    sb.sortableIndex = getCategorySortIndex(sb.categoryId, fullBudget);
+
+                                                    //Record keeping for each budget/outflow.
+                                                    if(!budgetRecord.hasOwnProperty(sb.categoryId))
+                                                        budgetRecord[sb.categoryId] = 0;
+
+                                                    if(!outflowRecord.hasOwnProperty(sb.categoryId))
+                                                        outflowRecord[sb.categoryId] = 0;
+
+                                                    //Keep our running total
+                                                    budgetRecord[sb.categoryId] += sb.budgeted;
+                                                    outflowRecord[sb.categoryId] += sb.outflowAmount;
+
+                                                    //Set the running total locally
+                                                    sb.runningBudget = budgetRecord[sb.categoryId];
+                                                    sb.runningOutflow = outflowRecord[sb.categoryId];
+                                                    sb.runningDifference = sb.runningBudget + sb.runningOutflow;
+
+                                                    return sb;
+
+                                                })
+                                                .indexBy(function(sb) { return sb.categoryId; })
+                                                .value();
 
                 return b;
 
@@ -391,19 +414,28 @@ angular.module('YNAWB')
                          * we need to go through our budgets and look for stuff that
                          * isn't in each category. */
 
-                         b.monthlyBudgets = _.map(b.monthlyBudgets, function(mb) {
+                         b.monthlyBudgets    = _.chain(b.monthlyBudgets)
+                                                .map(function(mb) {
 
-                            mb.monthlySubCategoryBudgets = _.map(masterBudgets, function(msb) {
+                                                    mb.monthlySubCategoryBudgets = _.chain(masterBudgets)
+                                                                                    .filter(removeTombstones)
+                                                                                    .map(function(msb) {
 
-                                var existingBudget = _.find(mb.monthlySubCategoryBudgets, function(mscb) { return mscb.categoryId == msb.categoryId; });
+                                                                                        var existingBudget = _.chain(mb.monthlySubCategoryBudgets)
+                                                                                                              .filter(removeTombstones)
+                                                                                                              .find(function(mscb) { return mscb.categoryId == msb.categoryId; })
+                                                                                                              .value();
 
-                                return (existingBudget != null) ? existingBudget : msb;
+                                                                                        return (existingBudget != null) ? existingBudget : msb;
 
-                            });
+                                                                                    })
+                                                                                    .value();
 
-                            return mb;
+                                                    return mb;
 
-                         });
+                                                })
+                                                .sortBy(function(mb) { return mb.month; })
+                                                .value();
 
                          /* Remove any closed accounts. */
                          b.accounts = _.filter(b.accounts, function(a) { return (!a.hasOwnProperty("isTombstone") || !a.isTombstone); });

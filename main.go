@@ -44,9 +44,7 @@ func main() {
 	server.Use(martini.Logger())
 	server.Use(martini.Recovery())
 	server.Use(sessions.Sessions("ynawb", store))
-	server.Use(martini.Static(config.Server.WebRoot, martini.StaticOptions{
-		Fallback: config.Server.ErrorFile,
-	}))
+	server.Use(martini.Static(config.Server.WebRoot))
 
 	//Configure the Martini router
 	server.MapTo(router, (*martini.Routes)(nil))
@@ -55,6 +53,7 @@ func main() {
 	//Redirects the users over to Dropbox for authentication
 	router.Get("/auth", func(res http.ResponseWriter, req *http.Request) {
 
+		fmt.Printf("HERE WE GO SERVING /AUTH")
 		/* So, this is a weird edge case. Because we're serving most
 		 * of our app via the static files handler and the HTTPS redirect
 		 * in the martinin-contrib/secure package only works for defined routes,
@@ -211,6 +210,10 @@ func main() {
 
 	//Add our endpoint to get their YNAB data.
 	router.Get("/api/budgetdata/:budget/:path", func(res http.ResponseWriter, req *http.Request, params martini.Params) string {
+
+		f, _ := ioutil.ReadFile("/Users/james/Dropbox/YNAB/Our Budget~C9C0AF8E.ynab4/data5-9436737A/E48B9F31-EAC7-302B-CAB4-4565B0E821FE/Budget.yfull")
+
+		return string(f)
 
 		//Do some checks on our parameters
 		if params["budget"] == "" || params["budget"] == "undefined" {

@@ -74,19 +74,15 @@ ynab.directive('budgetList', function() {
                     return 0;
                 }
 
-                return _.reduce(c.subCategories, function(m1, sc) {
+                return _.reduce(c.subCategories, function(memo, sc) {
 
                     var subCategoryBudget = b.budgets.monthlySubCategoryBudgets[sc.entityId];
 
                     if(subCategoryBudget == null) {
-                        return m1;
+                        return memo;
                     }
 
-                    return m1 + _.reduce(subCategoryBudget.transactions, function(m2, t) {
-
-                        return m2 + t.amount;
-
-                    }, 0);
+                    return memo + subCategoryBudget.outflowAmount;
 
                 }, 0);
             };
