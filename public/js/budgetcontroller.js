@@ -1,6 +1,7 @@
 angular.module('YNAWB') 
     .controller('BudgetController', ['$scope', '$routeParams', '$q', 'BudgetDataService', function($scope, $routeParams, $q, budgetDataService) {
 
+        $scope.loading = true;
         $scope.params = budgetDataService.params;
 
         $scope.params.budget = $routeParams.budget;
@@ -33,7 +34,8 @@ angular.module('YNAWB')
                 //Now go get all of our budget data.
                 $q.all(promises)
                     .then(function(budgets) {
-                        $scope.budgetData = _.sortBy(budgets, function(b) { return b.summary.date; });;
+                        $scope.budgetData = _.sortBy(budgets, function(b) { return b.summary.date; });
+                        $scope.loading = false;
                     });
 
             }, function() {
