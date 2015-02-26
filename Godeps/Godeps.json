@@ -1,0 +1,61 @@
+{
+	"ImportPath": "ynawb",
+	"GoVersion": "go1.3.3",
+	"Deps": [
+		{
+			"ImportPath": "github.com/boj/redistore",
+			"Comment": "v1",
+			"Rev": "9d1554b400d726c7aa54b6e4a836f273b72b97f7"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Comment": "v1.0-rc1-10-g33e0aa1",
+			"Rev": "33e0aa1cb7c019ccc3fbe049a8262a6403d30504"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "785e0ca9319196b94fd61abd4c9eab5c11777377"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "785e0ca9319196b94fd61abd4c9eab5c11777377"
+		},
+		{
+			"ImportPath": "github.com/go-martini/martini",
+			"Comment": "v1.0-111-gd1cf5ab",
+			"Rev": "d1cf5ab6fb49158d2d9c0167618fc560a0855aee"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+		},
+		{
+			"ImportPath": "github.com/gorilla/securecookie",
+			"Rev": "5f171f42328bdd573211bb82bdee8f259c4c61ae"
+		},
+		{
+			"ImportPath": "github.com/gorilla/sessions",
+			"Rev": "13c86220d944600e7a6e3de6c87418896ccfbe77"
+		},
+		{
+			"ImportPath": "github.com/martini-contrib/sessions",
+			"Rev": "fa13114fbcf036dff8185d728651d85fcef772db"
+		},
+		{
+			"ImportPath": "github.com/stacktic/dropbox",
+			"Rev": "4423ac7952b62b226a5b80ab8efc4599ff897b97"
+		},
+		{
+			"ImportPath": "github.com/unrolled/render",
+			"Rev": "bdfac4a8df10cc9dc03ee14ba2f655137fd70378"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "b6fdb7d8a4ccefede406f8fe0f017fb58265054c"
+		},
+		{
+			"ImportPath": "golang.org/x/oauth2",
+			"Rev": "36fb42e1e88262b05ae676ce0085dd73fd66abfd"
+		}
+	]
+}
