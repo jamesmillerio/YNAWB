@@ -116,17 +116,20 @@ func getConfiguration(t reflect.Type, v reflect.Value, parent string) {
 
 		value := env[key]
 
-		fmt.Printf("key: %v, value: %v\n", key, value)
+		if value != "" {
 
-		switch fieldType.Name() {
-		case "string":
-			fieldValue.SetString(value)
-		case "int":
-			if i, err := strconv.Atoi(value); err != nil {
-				fieldValue.SetInt(int64(i))
+			fmt.Printf("key: %v, value: %v\n", key, value)
+
+			switch fieldType.Name() {
+			case "string":
+				fieldValue.SetString(value)
+			case "int":
+				if i, err := strconv.Atoi(value); err != nil {
+					fieldValue.SetInt(int64(i))
+				}
+			default:
+				getConfiguration(fieldType, fieldValue, key)
 			}
-		default:
-			getConfiguration(fieldType, fieldValue, key)
 		}
 
 	}
