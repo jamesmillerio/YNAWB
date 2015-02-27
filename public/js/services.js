@@ -477,11 +477,12 @@ angular.module('YNAWB')
                 var availableToBudget   = (budgeted > income) ? budgeted - income : 0;
                 var outflows            = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
                 var balance             = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.runningBudget + b.runningOutflow; }, 0);
-
+                
                 deferred.resolve({
                     summary: {
                         date:                   new Date(year, month - 1, 1),
                         monthAbbr:              self.monthAbbr[month - 1],
+                        lastMonthAbbr:          self.monthAbbr[month - 2],
                         year:                   year,
                         notBudgeted:            (income > budgeted) ? (income - budgeted) : 0,
                         overspent:              (budgeted < outflows) ? (budgeted - outflows) : 0,
