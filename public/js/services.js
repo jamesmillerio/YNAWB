@@ -18,6 +18,14 @@ angular.module('YNAWB')
 
         };
 
+        var overspentCalculation = function(m, b) { 
+
+            var diff = b.runningDifference < 0 ? b.runningDifference : 0;
+
+            return m + diff; 
+
+        };
+
         var masterCategories = function(fullBudget) {
 
             return _.filter(fullBudget.masterCategories, function(c) { 
@@ -207,6 +215,7 @@ angular.module('YNAWB')
             var budgetRecord = {};
             var outflowRecord = {};
             var groupedTransactions = _.groupBy(fullBudget.transactions, function(t) { return t.date.substring(0, 7); });
+            var previousMonth = null;
 
             return _.chain(fullBudget.monthlyBudgets)
                     .sortBy(function(b) { return b.month; })
@@ -307,8 +316,8 @@ angular.module('YNAWB')
                                                             outflowRecord[sb.categoryId] += sb.outflowAmount;
 
                                                             //Set the running total locally
-                                                            sb.runningBudget = budgetRecord[sb.categoryId];
-                                                            sb.runningOutflow = outflowRecord[sb.categoryId];
+                                                            sb.runningBudget = parseFloat(budgetRecord[sb.categoryId].toFixed(2));
+                                                            sb.runningOutflow = parseFloat(outflowRecord[sb.categoryId].toFixed(2));
                                                             sb.runningDifference = sb.runningBudget + sb.runningOutflow;
 
                                                             if(sb.runningDifference < 0) {
@@ -321,6 +330,33 @@ angular.module('YNAWB')
                                                         })
                                                         .indexBy(function(sb) { return sb.categoryId; })
                                                         .value();
+
+                        if(previousMonth != null) {
+
+                            var incomeThisMonth     = incomeForMonth(date[0], date[1], fullBudget);
+                            var budgetedThisMonth   = _.reduce(b.monthlySubCategoryBudgets, function(m, budget) { return m + budget.budgeted; }, 0);
+                            
+                            b.notBudgetedThisMonth  = previousMonth.notBudgetedThisMonth + previousMonth.overspentThisMonth + incomeThisMonth - budgetedThisMonth;
+                            b.overspentThisMonth    = _.reduce(b.monthlySubCategoryBudgets, overspentCalculation, 0);
+                            
+                            b.overspentLastMonth    = previousMonth.overspentThisMonth;
+                            b.notBudgetedLastMonth  = previousMonth.notBudgetedThisMonth;
+                            
+                            b.incomeThisMonth       = incomeThisMonth;
+                            b.budgetedThisMonth     = budgetedThisMonth;
+
+                        } else {
+
+                            b.notBudgetedThisMonth  = 0;
+                            b.notBudgetedLastMonth  = 0;
+                            b.overspentLastMonth    = 0;
+                            b.incomeThisMonth       = 0;
+                            b.budgetedThisMonth     = 0;
+                            b.overspentThisMonth    = 0;
+
+                        }
+
+                        previousMonth = b;
 
                         return b;
 
@@ -469,31 +505,31 @@ angular.module('YNAWB')
             var deferred = $q.defer();
 
             self.getBudgetData(budget, device, accountId).then(function(b) {
-                
-                var previousMonth       = new Date(year, month - 1, 1);
+
+                var previousMonth           = new Date(year, month - 1, 1);
+                var previousPreviousMonth   = new Date(year, month - 1, 1);
 
                 /* Subtract two since months are zero-relative 
                  * and we need to go back a month. */
                 previousMonth.setMonth(previousMonth.getMonth() - 1);
+                previousPreviousMonth.setMonth(previousPreviousMonth.getMonth() - 2);
 
-                var summary             = getBudgetSummary(b);
-                var yearMonth           = formatYearMonth(year, month) + "-01";
-                var lastYearMonth       = formatYearMonth(previousMonth.getFullYear(), previousMonth.getMonth() + 1) + "-01";
-                var income              = incomeForMonth(year, month, b);
-                var lastMonthsIncome    = incomeForMonth(previousMonth.getFullYear(), previousMonth.getMonth() + 1, b); //Once again, months are zero relative so add one.
-                var lastMonthBudgeted   = summary[lastYearMonth] == null ? 0 : _.reduce(summary[lastYearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
-                var budgeted            = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
-                var availableToBudget   = (budgeted > income) ? budgeted - income : 0;
-                var lastMonthOutflows   = summary[lastYearMonth] == null ? 0 : _.reduce(summary[lastYearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
-                var outflows            = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
-                var balance             = summary[yearMonth] == null ? 0 : _.reduce(summary[yearMonth].monthlySubCategoryBudgets, function(m, b) { return m + b.runningBudget + b.runningOutflow; }, 0);
-                var lastMonthOverspent  = summary[lastYearMonth] ==  null ? 0 : _.reduce(summary[lastYearMonth].monthlySubCategoryBudgets, function(m, b) { 
+                var summary                 = getBudgetSummary(b);
+                var yearMonth               = formatYearMonth(year, month) + "-01";
+                var lastYearMonth           = formatYearMonth(previousMonth.getFullYear(), previousMonth.getMonth() + 1) + "-01";
+                var currentSummary          = summary[yearMonth];
+                var lastSummary             = summary[lastYearMonth];
+                var lastLastYearMonth       = formatYearMonth(previousPreviousMonth.getFullYear(), previousPreviousMonth.getMonth() + 1) + "-01";
+                var income                  = incomeForMonth(year, month, b);
+                var lastMonthsIncome        = incomeForMonth(previousMonth.getFullYear(), previousMonth.getMonth() + 1, b); //Once again, months are zero relative so add one.
 
-                    var diff = b.runningDifference < 0 ? b.runningDifference : 0;
-
-                    return m + diff; 
-
-                }, 0);
+                var lastMonthBudgeted       = lastSummary == null                   ? 0 : _.reduce(lastSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
+                var budgeted                = currentSummary == null                ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
+                var lastMonthOutflows       = lastSummary == null                   ? 0 : _.reduce(lastSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
+                var outflows                = currentSummary == null                ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
+                var balance                 = currentSummary == null                ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.runningBudget + b.runningOutflow; }, 0);
+                var lastMonthOverspent      = lastSummary ==  null                  ? 0 : _.reduce(lastSummary.monthlySubCategoryBudgets, overspentCalculation, 0);
+                var lastLastMonthOverspent  = summary[lastLastYearMonth] ==  null   ? 0 : _.reduce(summary[lastLastYearMonth].monthlySubCategoryBudgets, overspentCalculation, 0);
 
                 deferred.resolve({
                     summary: {
@@ -502,12 +538,13 @@ angular.module('YNAWB')
                         lastMonthAbbr:          self.monthAbbr[month - 2],
                         year:                   year,
                         notBudgeted:            (income > budgeted) ? (income - budgeted) : 0,
-                        lastMonthNotBudgeted:   (lastMonthsIncome > lastMonthBudgeted) ? (lastMonthsIncome - lastMonthBudgeted) : 0,
-                        lastMonthOverspent:     lastMonthOverspent,
+                        //lastMonthNotBudgeted:   (lastMonthsIncome + lastLastMonthOverspent) - lastMonthBudgeted,
+                        lastMonthNotBudgeted:   currentSummary.notBudgetedLastMonth,
+                        lastMonthOverspent:     currentSummary.overspentLastMonth,
                         overspent:              (budgeted < outflows) ? (budgeted - outflows) : 0,
-                        income:                 income,
-                        budgeted:               budgeted,
-                        availableToBudget:      availableToBudget,
+                        income:                 currentSummary.incomeThisMonth,
+                        budgeted:               currentSummary.budgetedThisMonth,
+                        availableToBudget:      currentSummary.notBudgetedThisMonth,
                         outflows:               outflows,
                         balance:                balance
                     },
