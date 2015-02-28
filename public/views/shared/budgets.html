@@ -26,9 +26,9 @@
 
                             <div class="col-lg-4 text-align-right padding-horizontal-sm">
 
-                                {{ budget.summary.notBudgeted.toCurrency() }}
+                                {{ budget.summary.lastMonthNotBudgeted.toCurrency() }}
                                 <br />
-                                -{{ (budget.summary.income - budget.summary.budgeted).toCurrency() }}
+                                {{ budget.summary.lastMonthOverspent.toCurrency() }}
                                 <br />
                                 +{{ budget.summary.income.toCurrency() }}
                                 <br />
