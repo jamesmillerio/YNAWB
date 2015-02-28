@@ -17,6 +17,7 @@ import (
 
 func main() {
 
+	//Set our environment
 	martini.Env = martini.Prod
 
 	//Load our config information and start our web server.
@@ -78,7 +79,7 @@ func main() {
 
 	})
 
-	//Accepts the response after authorizing via Dropbox
+	/* Accepts the response after authorizing with Dropbox. */
 	router.Get("/auth/response", func(res http.ResponseWriter, req *http.Request) {
 
 		//If they cancelled their login, redirect them back to the home page.
@@ -129,7 +130,9 @@ func main() {
 		http.Redirect(res, req, url, http.StatusFound)
 	})
 
-	//Present the list of budgest for the user to select. We're joining a bunch of JSON documents here.
+	/* Retrieves a list of the users YNAB budgets and devices from
+	 * their Dropbox account. Redirects them back to the home page if
+	 * their cookie has expired. */
 	router.Get("/api/budgets", func(res http.ResponseWriter, req *http.Request) {
 
 		session, _ := store.Get(req, "ynawb")
@@ -196,14 +199,15 @@ func main() {
 
 		} else {
 
-			http.Redirect(res, req, config.Server.HostName, 200)
+			http.Redirect(res, req, config.Server.HostName, http.StatusUnauthorized)
 			return
 
 		}
 
 	})
 
-	//Add our endpoint to get their YNAB data.
+	/* Retrieves the users YNAB budget data from their Dropbox account.
+	 * Redirects them back to the home page if their cookie has expired. */
 	router.Get("/api/budgetdata/:budget/:path", func(res http.ResponseWriter, req *http.Request, params martini.Params) string {
 
 		//Do some checks on our parameters
@@ -263,7 +267,7 @@ func main() {
 
 		} else {
 
-			http.Redirect(res, req, config.Server.HostName, 200)
+			http.Redirect(res, req, config.Server.HostName, http.StatusUnauthorized)
 
 			return ""
 
@@ -286,6 +290,8 @@ func main() {
 
 }
 
+/* Retrieves files from the users Dropbox. Returns a byte
+ * array of the files contents. */
 func loadDropboxFile(path string, db *dropbox.Dropbox) ([]byte, error) {
 
 	closer, _, err := db.Download(path, "", 0)
@@ -303,6 +309,8 @@ func loadDropboxFile(path string, db *dropbox.Dropbox) ([]byte, error) {
 
 }
 
+/* A helper method to handle any errors. Redirects the user
+ * to the specified URL on error. */
 func handleError(err error, res http.ResponseWriter, req *http.Request, config Configuration) {
 
 	//Print errors
