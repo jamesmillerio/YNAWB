@@ -204,165 +204,170 @@ angular.module('YNAWB')
 
         var getBudgetSummary  = function(fullBudget) {
 
-            if(self.transformedBudgetData != null) { return self.transformedBudgetData; }
+            if(self.transformedBudgetData == null) { 
 
-            /* In order to make processing a bit easier on the client side, 
-             * we're going to transform the budgets into a format where we can
-             * essentially just say "Give me the information for month m and 
-              * year n" and it'll hand us back everything we need for each budget
-              * category. */
-            
-            var budgetRecord = {};
-            var outflowRecord = {};
-            var groupedTransactions = _.groupBy(fullBudget.transactions, function(t) { return t.date.substring(0, 7); });
-            var previousMonth = null;
+                /* In order to make processing a bit easier on the client side, 
+                 * we're going to transform the budgets into a format where we can
+                 * essentially just say "Give me the information for month m and 
+                  * year n" and it'll hand us back everything we need for each budget
+                  * category. */
+                
+                var budgetRecord = {};
+                var outflowRecord = {};
+                var groupedTransactions = _.groupBy(fullBudget.transactions, function(t) { return t.date.substring(0, 7); });
+                var previousMonth = null;
 
-            return _.chain(fullBudget.monthlyBudgets)
-                    .sortBy(function(b) { return b.month; })
-                    .map(function(b) {
+                self.transformedBudgetData = _.chain(fullBudget.monthlyBudgets)
+                                                .sortBy(function(b) { return b.month; })
+                                                .map(function(b) {
 
-                        // Now we want to group by the budget category. This is so 
-                        var date                = _.map(b.month.split("-"), function(d) { return parseInt(d, 10) });
-                        var yearMonth           = b.month.toYNABMonthDate();
-                        var priorYearMonth      = "";
+                                                    // Now we want to group by the budget category. This is so 
+                                                    var date                = _.map(b.month.split("-"), function(d) { return parseInt(d, 10) });
+                                                    var yearMonth           = b.month.toYNABMonthDate();
+                                                    var priorYearMonth      = "";
 
-                        if(date[1] == 1) {
-                            
-                            //It's January, we need to go back to December of the previous year.
-                            priorYearMonth      = (date[0] - 1).toString() + "-12";
+                                                    if(date[1] == 1) {
+                                                        
+                                                        //It's January, we need to go back to December of the previous year.
+                                                        priorYearMonth      = (date[0] - 1).toString() + "-12";
 
-                        } else {
+                                                    } else {
 
-                            //Same year, just move back a month. Also make sure we're prepending a zero if needed.
-                            var priorMonth  = date[1] - 1;
+                                                        //Same year, just move back a month. Also make sure we're prepending a zero if needed.
+                                                        var priorMonth  = date[1] - 1;
 
-                            priorMonth      = (priorMonth < 10) ? "0" + priorMonth.toString() : priorMonth.toString();
+                                                        priorMonth      = (priorMonth < 10) ? "0" + priorMonth.toString() : priorMonth.toString();
 
-                            priorYearMonth  = date[0].toString() + "-" + priorMonth;
+                                                        priorYearMonth  = date[0].toString() + "-" + priorMonth;
 
-                        }
+                                                    }
 
-                        b.monthlySubCategoryBudgets  = _.chain(b.monthlySubCategoryBudgets)
-                                                        .map(function(sb) {
+                                                    b.monthlySubCategoryBudgets  = _.chain(b.monthlySubCategoryBudgets)
+                                                                                    .map(function(sb) {
 
-                                                            var trans = (groupedTransactions[yearMonth] == null) ? [] : groupedTransactions[yearMonth];
+                                                                                        /* Using JSON.parse/JSON.stringify is one of the 
+                                                                                         * faster ways to do a deep clone of an object. */
+                                                                                        var subbudget = JSON.parse(JSON.stringify(sb));
+                                                                                        var trans = (groupedTransactions[yearMonth] == null) ? [] : groupedTransactions[yearMonth];
 
-                                                            //sb.transactions = _.filter(fullBudget.transactions, function(t) {
-                                                            sb.transactions = _.filter(trans, function(t) {
+                                                                                        subbudget.transactions = _.filter(trans, function(t) {
 
-                                                                var isInMonth = t.date.indexOf(yearMonth) == 0;
-                                                                var isInPriorMonth = t.date.indexOf(priorYearMonth) == 0;
-                                                                var isDeferred = false;
-                                                                var isInCategory = false;
+                                                                                            var isInMonth = t.date.indexOf(yearMonth) == 0;
+                                                                                            var isInPriorMonth = t.date.indexOf(priorYearMonth) == 0;
+                                                                                            var isDeferred = false;
+                                                                                            var isInCategory = false;
 
-                                                                if(t.categoryId == "Category/__Split__" && t.subTransactions != null && t.subTransactions.length > 0) {
-                                                                    
-                                                                    isInCategory = _.find(t.subTransactions, function(st) { 
+                                                                                            if(t.categoryId == "Category/__Split__" && t.subTransactions != null && t.subTransactions.length > 0) {
+                                                                                                
+                                                                                                isInCategory = _.find(t.subTransactions, function(st) { 
 
-                                                                        if(isInPriorMonth && st.categoryId == "Category/__DeferredIncome__") {
-                                                                            isDeferred = true;
-                                                                        }
+                                                                                                    if(isInPriorMonth && st.categoryId == "Category/__DeferredIncome__") {
+                                                                                                        isDeferred = true;
+                                                                                                    }
 
-                                                                        return st.categoryId == sb.categoryId;
+                                                                                                    return st.categoryId == subbudget.categoryId;
 
-                                                                    }) != null;
+                                                                                                }) != null;
 
-                                                                    return isInCategory && (isInMonth || isDeferred);                            
+                                                                                                return isInCategory && (isInMonth || isDeferred);                            
 
-                                                                } else {
-                                                                    
-                                                                    isDeferred = isInPriorMonth && t.categoryId == "Category/__DeferredIncome__";
-                                                                    isInCategory = t.categoryId == sb.categoryId;
+                                                                                            } else {
+                                                                                                
+                                                                                                isDeferred = isInPriorMonth && t.categoryId == "Category/__DeferredIncome__";
+                                                                                                isInCategory = t.categoryId == subbudget.categoryId;
 
-                                                                }
+                                                                                            }
 
-                                                                return isInCategory && (isInMonth || isDeferred);
+                                                                                            return isInCategory && (isInMonth || isDeferred);
 
-                                                            });
+                                                                                        });
 
-                                                            sb.outflowAmount = _.reduce(sb.transactions, function(m1, t) { 
+                                                                                        subbudget.outflowAmount = _.reduce(subbudget.transactions, function(m1, t) { 
 
-                                                                var amount = 0;
+                                                                                            var amount = 0;
 
-                                                                if(t.hasOwnProperty("subTransactions") && t.subTransactions != null && t.subTransactions.length > 0) {
+                                                                                            if(t.hasOwnProperty("subTransactions") && t.subTransactions != null && t.subTransactions.length > 0) {
 
-                                                                    amount = _.chain(t.subTransactions)
-                                                                              .filter(function(st) { return st.categoryId === sb.categoryId; })
-                                                                              .filter(function(st) { return st.amount < 0; })
-                                                                              .reduce(function(m2, st) { return m2 + st.amount; }, 0)
-                                                                              .value();
+                                                                                                amount = _.chain(t.subTransactions)
+                                                                                                          .filter(function(st) { return st.categoryId === subbudget.categoryId; })
+                                                                                                          //.filter(function(st) { return st.amount < 0; })
+                                                                                                          .reduce(function(m2, st) { return m2 + st.amount; }, 0)
+                                                                                                          .value();
 
-                                                                } else {
-                                                                    //amount = (t.amount < 0) ? t.amount : 0;
-                                                                    amount = t.amount;
-                                                                }
+                                                                                            } else {
+                                                                                                amount = t.amount;
+                                                                                            }
 
-                                                                return m1 + amount;
+                                                                                            return m1 + amount;
 
-                                                            }, 0);
+                                                                                        }, 0);
 
-                                                            sb.name = getBudgetName(sb.categoryId, fullBudget);
-                                                            sb.sortableIndex = getCategorySortIndex(sb.categoryId, fullBudget);
+                                                                                        subbudget.name = getBudgetName(subbudget.categoryId, fullBudget);
+                                                                                        subbudget.sortableIndex = getCategorySortIndex(subbudget.categoryId, fullBudget);
 
-                                                            //Record keeping for each budget/outflow.
-                                                            if(!budgetRecord.hasOwnProperty(sb.categoryId))
-                                                                budgetRecord[sb.categoryId] = 0;
+                                                                                        //Record keeping for each budget/outflow.
+                                                                                        if(!budgetRecord.hasOwnProperty(subbudget.categoryId))
+                                                                                            budgetRecord[subbudget.categoryId] = 0;
 
-                                                            if(!outflowRecord.hasOwnProperty(sb.categoryId))
-                                                                outflowRecord[sb.categoryId] = 0;
+                                                                                        if(!outflowRecord.hasOwnProperty(subbudget.categoryId))
+                                                                                            outflowRecord[subbudget.categoryId] = 0;
 
-                                                            //Keep our running total
-                                                            budgetRecord[sb.categoryId] += sb.budgeted;
-                                                            outflowRecord[sb.categoryId] += sb.outflowAmount;
+                                                                                        //Keep our running total
+                                                                                        budgetRecord[subbudget.categoryId] += subbudget.budgeted;
+                                                                                        outflowRecord[subbudget.categoryId] += subbudget.outflowAmount;
 
-                                                            //Set the running total locally
-                                                            sb.runningBudget = parseFloat(budgetRecord[sb.categoryId].toFixed(2));
-                                                            sb.runningOutflow = parseFloat(outflowRecord[sb.categoryId].toFixed(2));
-                                                            sb.runningDifference = sb.runningBudget + sb.runningOutflow;
+                                                                                        //Set the running total locally
+                                                                                        subbudget.runningBudget = parseFloat(budgetRecord[subbudget.categoryId].toFixed(2));
+                                                                                        subbudget.runningOutflow = parseFloat(outflowRecord[subbudget.categoryId].toFixed(2));
+                                                                                        subbudget.runningDifference = subbudget.runningBudget + subbudget.runningOutflow;
 
-                                                            if(sb.runningDifference < 0) {
-                                                                budgetRecord[sb.categoryId] = 0;
-                                                                outflowRecord[sb.categoryId] = 0;
-                                                            }
+                                                                                        if(subbudget.runningDifference < 0) {
+                                                                                            budgetRecord[subbudget.categoryId] = 0;
+                                                                                            outflowRecord[subbudget.categoryId] = 0;
+                                                                                        }
 
-                                                            return sb;
+                                                                                        return subbudget;
 
-                                                        })
-                                                        .indexBy(function(sb) { return sb.categoryId; })
-                                                        .value();
+                                                                                    })
+                                                                                    .indexBy(function(sb) { return sb.categoryId; })
+                                                                                    .value();
 
-                        if(previousMonth != null) {
+                                                    if(previousMonth != null) {
 
-                            var incomeThisMonth     = incomeForMonth(date[0], date[1], fullBudget);
-                            var budgetedThisMonth   = _.reduce(b.monthlySubCategoryBudgets, function(m, budget) { return m + budget.budgeted; }, 0);
-                            
-                            b.notBudgetedThisMonth  = previousMonth.notBudgetedThisMonth + previousMonth.overspentThisMonth + incomeThisMonth - budgetedThisMonth;
-                            b.overspentThisMonth    = _.reduce(b.monthlySubCategoryBudgets, overspentCalculation, 0);
-                            
-                            b.overspentLastMonth    = previousMonth.overspentThisMonth;
-                            b.notBudgetedLastMonth  = previousMonth.notBudgetedThisMonth;
-                            
-                            b.incomeThisMonth       = incomeThisMonth;
-                            b.budgetedThisMonth     = budgetedThisMonth;
+                                                        var incomeThisMonth     = incomeForMonth(date[0], date[1], fullBudget);
+                                                        var budgetedThisMonth   = _.reduce(b.monthlySubCategoryBudgets, function(m, budget) { return m + budget.budgeted; }, 0);
+                                                        
+                                                        b.notBudgetedThisMonth  = previousMonth.notBudgetedThisMonth + previousMonth.overspentThisMonth + incomeThisMonth - budgetedThisMonth;
+                                                        b.overspentThisMonth    = _.reduce(b.monthlySubCategoryBudgets, overspentCalculation, 0);
+                                                        
+                                                        b.overspentLastMonth    = previousMonth.overspentThisMonth;
+                                                        b.notBudgetedLastMonth  = previousMonth.notBudgetedThisMonth;
+                                                        
+                                                        b.incomeThisMonth       = incomeThisMonth;
+                                                        b.budgetedThisMonth     = budgetedThisMonth;
 
-                        } else {
+                                                    } else {
 
-                            b.notBudgetedThisMonth  = 0;
-                            b.notBudgetedLastMonth  = 0;
-                            b.overspentLastMonth    = 0;
-                            b.incomeThisMonth       = 0;
-                            b.budgetedThisMonth     = 0;
-                            b.overspentThisMonth    = 0;
+                                                        b.notBudgetedThisMonth  = 0;
+                                                        b.notBudgetedLastMonth  = 0;
+                                                        b.overspentLastMonth    = 0;
+                                                        b.incomeThisMonth       = 0;
+                                                        b.budgetedThisMonth     = 0;
+                                                        b.overspentThisMonth    = 0;
 
-                        }
+                                                    }
 
-                        previousMonth = b;
+                                                    previousMonth = b;
 
-                        return b;
+                                                    return b;
 
-            })
-            .indexBy(function(b) { return b.month; })
-            .value();
+                                                })
+                                                .indexBy(function(b) { return b.month; })
+                                                .value();
+
+            }
+
+            return self.transformedBudgetData;
 
         };
 
@@ -484,7 +489,7 @@ angular.module('YNAWB')
                          /* Remove any closed accounts. */
                          b.accounts = _.filter(b.accounts, function(a) { return (!a.hasOwnProperty("isTombstone") || !a.isTombstone); });
 
-                        //Save for later use.
+                        //Create a budget summary and save for later use.
                         self.budgetdata = b;
 
                         //Resolve the promise.
@@ -518,18 +523,11 @@ angular.module('YNAWB')
                 var yearMonth               = formatYearMonth(year, month) + "-01";
                 var lastYearMonth           = formatYearMonth(previousMonth.getFullYear(), previousMonth.getMonth() + 1) + "-01";
                 var currentSummary          = summary[yearMonth];
-                var lastSummary             = summary[lastYearMonth];
-                var lastLastYearMonth       = formatYearMonth(previousPreviousMonth.getFullYear(), previousPreviousMonth.getMonth() + 1) + "-01";
                 var income                  = incomeForMonth(year, month, b);
                 var lastMonthsIncome        = incomeForMonth(previousMonth.getFullYear(), previousMonth.getMonth() + 1, b); //Once again, months are zero relative so add one.
-
-                var lastMonthBudgeted       = lastSummary == null                   ? 0 : _.reduce(lastSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
-                var budgeted                = currentSummary == null                ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
-                var lastMonthOutflows       = lastSummary == null                   ? 0 : _.reduce(lastSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
-                var outflows                = currentSummary == null                ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
-                var balance                 = currentSummary == null                ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.runningBudget + b.runningOutflow; }, 0);
-                var lastMonthOverspent      = lastSummary ==  null                  ? 0 : _.reduce(lastSummary.monthlySubCategoryBudgets, overspentCalculation, 0);
-                var lastLastMonthOverspent  = summary[lastLastYearMonth] ==  null   ? 0 : _.reduce(summary[lastLastYearMonth].monthlySubCategoryBudgets, overspentCalculation, 0);
+                var budgeted                = currentSummary == null ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.budgeted; }, 0);
+                var outflows                = currentSummary == null ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.outflowAmount; }, 0);
+                var balance                 = currentSummary == null ? 0 : _.reduce(currentSummary.monthlySubCategoryBudgets, function(m, b) { return m + b.runningBudget + b.runningOutflow; }, 0);
 
                 deferred.resolve({
                     summary: {
@@ -538,7 +536,6 @@ angular.module('YNAWB')
                         lastMonthAbbr:          self.monthAbbr[month - 2],
                         year:                   year,
                         notBudgeted:            (income > budgeted) ? (income - budgeted) : 0,
-                        //lastMonthNotBudgeted:   (lastMonthsIncome + lastLastMonthOverspent) - lastMonthBudgeted,
                         lastMonthNotBudgeted:   currentSummary.notBudgetedLastMonth,
                         lastMonthOverspent:     currentSummary.overspentLastMonth,
                         overspent:              (budgeted < outflows) ? (budgeted - outflows) : 0,
@@ -548,7 +545,7 @@ angular.module('YNAWB')
                         outflows:               outflows,
                         balance:                balance
                     },
-                    budgets: summary[yearMonth]
+                    budgets: currentSummary
 
                 });
 

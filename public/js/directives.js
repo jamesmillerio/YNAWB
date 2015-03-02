@@ -48,6 +48,8 @@ ynab.directive('budgetList', function() {
         templateUrl: '/views/shared/budgets.html',
         link: function(scope, element, attrs) {
 
+            scope.log = function(l) { console.log(l) };
+
             scope.totalBudgeted = function(c, b) {
                 
                 if(b == null) {

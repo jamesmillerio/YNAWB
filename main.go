@@ -210,6 +210,10 @@ func main() {
 	 * Redirects them back to the home page if their cookie has expired. */
 	router.Get("/api/budgetdata/:budget/:path", func(res http.ResponseWriter, req *http.Request, params martini.Params) string {
 
+		f, _ := ioutil.ReadFile("/Users/james/Dropbox/YNAB/Our Budget~C9C0AF8E.ynab4/data5-9436737A/E48B9F31-EAC7-302B-CAB4-4565B0E821FE/Budget.yfull")
+
+		return string(f)
+
 		//Do some checks on our parameters
 		if params["budget"] == "" || params["budget"] == "undefined" {
 			return ""

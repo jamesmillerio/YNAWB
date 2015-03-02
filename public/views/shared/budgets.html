@@ -138,11 +138,11 @@
 
     <div class="row">
 
-        <div class="col-lg-12">
+        <div class="col-lg-12 width-full">
 
-            <div class="panel panel-default">
+            <div class="panel panel-default width-full">
                 
-                <ul class="list-group">
+                <ul class="list-group width-full">
 
                     <li class="list-group-item active" ng-repeat-start="category in categories | orderBy: 'sortableIndex'"> 
 
@@ -166,19 +166,31 @@
 
                     </li>
 
-                    <li class="list-group-item" ng-repeat-end ng-repeat="subcategory in category.subCategories | orderBy:'sortableIndex'">
+                    <li class="list-group-item width-full" ng-repeat-end ng-repeat="subcategory in category.subCategories | orderBy:'sortableIndex'">
 
-                        <div class="form-inline">
+                        <div class="form-inline width-full">
 
-                            <div class="form-group">
+                            <div class="form-group width-full">
                         
-                                <div class="input-group">
-                        
-                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].budgeted.toCurrency(true) }}">
+                                <div class="input-group width-full">
 
-                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].outflowAmount.toCurrency(true) }}" disabled="disabled">
+                                    <div class="input-group-addon input-sm width-one-third text-align-right">
+
+                                        {{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].budgeted.toCurrency(true) }}
+
+                                    </div>
+
+                                    <div class="input-group-addon input-sm width-one-third text-align-right">
+                                        
+                                        {{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].outflowAmount.toCurrency(true) }}
+
+                                    </div>
                         
-                                    <input type="text" class="form-control input-sm text-align-right width-one-third" value="{{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].runningDifference.toCurrency() }}" disabled="disabled">
+                                    <div class="input-group-addon input-sm width-one-third text-align-right">
+                                        
+                                        {{ budget.budgets.monthlySubCategoryBudgets[subcategory.entityId].runningDifference.toCurrency() }}
+
+                                    </div>
                         
                                 </div>
                         
