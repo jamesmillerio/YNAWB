@@ -81,10 +81,12 @@ Number.prototype.toCurrency = function(blankOnZero) {
         return "";
     }
 
-    if(this < 0) {
-        return "-$" + Math.abs(this).toFixed(2);
+    var value = parseFloat(this.toFixed(2));
+
+    if(value < 0) {
+        return "-$" + Math.abs(value).toFixed(2);
     }
 
-    return "$" + this.toFixed(2);
+    return "$" + value.toFixed(2);
 
 };
