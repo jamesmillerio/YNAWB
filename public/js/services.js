@@ -98,7 +98,7 @@ angular.module('YNAWB')
                     case "Category/__ImmediateIncome__":
                         return memo + num.amount;
                     case "Category/__Split__":
-                        return memo + _.find(t.subTransactions, function(st) { return st.categoryId == "Category/__ImmediateIncome__"; }).amount;
+                        return memo + _.find(num.subTransactions, function(st) { return st.categoryId == "Category/__ImmediateIncome__"; }).amount;
                     default:
                         return memo;
                 }
