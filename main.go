@@ -96,6 +96,8 @@ func main() {
 			return
 		}
 
+		fmt.Printf("Exchanging code '%v'\n", code)
+
 		token, err := oAuthConf.Exchange(nil, code)
 
 		//If our token exchange doesn't work, throw an error and go to our error page.
