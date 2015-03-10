@@ -98,7 +98,8 @@ func main() {
 
 		fmt.Printf("Exchanging code '%v'\n", code)
 
-		token, err := oAuthConf.Exchange(nil, code)
+		//token, err := oAuthConf.Exchange(nil, code)
+		token, err := oAuthConf.Exchange(oauth2.NoContext, code)
 
 		//If our token exchange doesn't work, throw an error and go to our error page.
 		if err != nil {
